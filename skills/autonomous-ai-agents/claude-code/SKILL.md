@@ -45,7 +45,7 @@ terminal(command="claude -p 'Add error handling to all API calls in src/' --allo
 - Piped input processing (`cat file | claude -p "analyze this"`)
 - Any task where you don't need multi-turn conversation
 
-**Print mode skips ALL interactive dialogs** — no workspace trust prompt, no permission confirmations. This makes it ideal for automation.
+**Print mode skips the interactive dialogs, but NOT the permission checks underneath them.** Without an explicit permission flag, Claude Code in `-p` mode silently DENIES every Bash/Edit/Write tool call it attempts — there is no prompt to answer, the call just fails — and still returns `exit_code 0` with a `"type":"result"` JSON payload that reads like a normal response (often a detailed plan or "here's what I'll do once allowed"). This looks like a completed task and is not one: check the JSON's `permission_denials` array before trusting a `-p` run actually wrote anything. For a one-shot task that must actually execute (not just plan), pass `--dangerously-skip-permissions` (isolated repo/worktree, no prod access) or a narrower `--allowedTools`/`--permission-mode acceptEdits` — plain `-p "task"` with no permission flag is a dry run, not automation.
 
 ### Mode 2: Interactive PTY via tmux — Multi-Turn Sessions
 
@@ -739,6 +739,7 @@ Use `/context` in interactive mode to see a colored grid of context usage. Key t
 10. **Slash commands (like `/commit`) only work in interactive mode** — in `-p` mode, describe the task in natural language instead.
 11. **`--bare` skips OAuth** — requires `ANTHROPIC_API_KEY` env var or an `apiKeyHelper` in settings.
 12. **Context degradation is real** — AI output quality measurably degrades above 70% context window usage. Monitor with `/context` and proactively `/compact`.
+13. **`-p` with no permission flag silently denies every Bash/Edit/Write and still exits 0** — you get a confident-sounding plan/result, not the actual change. Always add `--dangerously-skip-permissions` (isolated repo only) or equivalent, then verify by checking `permission_denials` in the JSON output and/or `git status`/running the tests yourself — do not report Claude Code's summary as done work until you've confirmed files actually changed.
 
 ## Rules for Hermes Agents
 
@@ -752,3 +753,30 @@ Use `/context` in interactive mode to see a colored grid of context usage. Key t
 8. **Report results to user** — after completion, summarize what Claude did and what changed
 9. **Don't kill slow sessions** — Claude may be doing multi-step work; check progress instead
 10. **Use `--allowedTools`** — restrict capabilities to what the task actually needs
+
+## Standing Delegation Governance (default unless the user says otherwise)
+
+When Hermes is acting as a dev-lead/orchestrator delegating implementation work to
+Claude Code on a real project repo, apply this workflow by default:
+
+1. **Clone/operate under `~/work/<repo>`** and always work on a feature branch named
+   `hermes/<short-name>` — never commit or push directly to the default branch.
+2. **Conventional commits, then push, then open a PR with `gh pr create`** once Claude
+   Code's change is ready — don't leave finished work unpushed or un-PR'd.
+3. **Never touch production servers or run destructive commands** (drops, force-pushes,
+   prod migrations, deploys) without explicit user confirmation first, regardless of
+   what Claude Code proposes.
+4. **For any task estimated over ~30 minutes of work**, send the user a short plan
+   (what will change, where, rough steps) and wait for explicit OK before telling
+   Claude Code to start — this includes multi-file features, not just risky ones.
+5. **On completion, report: what changed, the PR link, and what the user needs to
+   test** — not a transcript of the Claude Code session. Before reporting, confirm the
+   delegated run actually executed (non-empty `git diff`/`git status`, tests you ran
+   yourself) rather than trusting a confident-sounding JSON `result` field — see the
+   print-mode permission pitfall above.
+6. **Before extending or rewriting an existing/inherited codebase**, do a discovery
+   pass first: map what's implemented vs. partial vs. mock vs. missing against any
+   spec/requirements doc, run the real test suite and quote actual pass/fail counts
+   (never claim results without running them), and list what's reusable. Deliver that
+   assessment before scaffolding a second/parallel implementation — a working system
+   already in the repo is almost always the starting point, not a throwaway.

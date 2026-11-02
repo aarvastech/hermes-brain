@@ -2204,3 +2204,7 @@ known_builtin_toolsets:
     - web
     - x_search
     - yuanbao
+onboarding:
+  seen:
+    profile_build_offered: true
+    busy_input_prompt: true
