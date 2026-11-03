@@ -30,6 +30,11 @@ and tell the user to rotate it, even a partially-masked one.
    `fill_input` (usernames aren't secret), then use
    `browser_vault(action="fill", handle="vault_xxx")` for the password field. The
    fill only works on the page whose origin matches what was saved.
+   Before filling, run `page_info()` and confirm the URL is the login page's origin. When `list` returns several items, use the handle whose `origin` equals the page origin exactly (scheme, host, port); labels can be misleading. On
+   `about:blank` or a new-tab page, call `ensure_real_tab()` and `goto_url(<app URL>)`
+   first: the vault checks the active tab's origin, and `fill_input` finds no fields on a
+   blank page. On Keycloak forms the username field is `#username` and the submit button
+   is `#kc-login`.
 3. If nothing is saved, call `browser_vault(action="save_login")` to prompt the user
    in-page. **This requires an interactive UI session** (desktop app, interactive
    CLI, terminal UI) — it fails with `prompt_unavailable` / "headless/cron/API" on
@@ -54,6 +59,7 @@ and tell the user to rotate it, even a partially-masked one.
   Settings every time; do not read the file or accept the paste as a workaround,
   even under time pressure, because plaintext credentials end up logged/cached
   outside the vault's access controls.
+- **Success after submit is the URL reaching the app's origin, not the form disappearing.** SSO pages can clear the form while still on the auth origin. Check `page_info()` for the app URL before reporting a login.
 - **`browser_vault(list)` returning empty does not mean "not saved yet"** — it can
   also mean the user saved it to a different Hermes profile or a different backend
   (e.g., Desktop app's local vault vs. the backend this session's browser tool uses).

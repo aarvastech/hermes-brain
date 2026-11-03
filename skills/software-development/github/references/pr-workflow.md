@@ -136,6 +136,17 @@ The response JSON includes the PR `number` — save it for later commands.
 
 To create as a draft, add `"draft": true` to the JSON body.
 
+## 3a. Stacked PRs (dependent changes)
+
+Use when a change needs code from another open PR that has not merged yet.
+
+- Branch from the parent PR's branch, not `main`: `git checkout -b <child> <parent-branch>`. A child branched from `main` hides the parent's files, and its diff looks unrelated to its real prerequisite.
+- Open the PR against the parent: `gh pr create --base <parent-branch>`. Put "Depends on #N — merge that first" at the top of the body.
+- Check scope before opening: `git diff --stat origin/<parent-branch>...HEAD` must list only the child's own files.
+- Audit every open stack's bases before merging anything: `gh pr list --state open --json number,headRefName,baseRefName`. A base that points at a branch which will be deleted or merged first must be retargeted before that merge.
+- Merge parent-first. After the parent merges, retarget the child with `gh pr edit <child> --base main`, then re-check that the diff is only the child's work.
+- If the child needs a sibling's files that the parent does not have yet (for example a generated snapshot), merge that sibling branch into the child and say so in the body. The PR diff carries those files until the sibling merges, so name them.
+
 ## 4. Monitoring CI Status
 
 ### Check CI Status
@@ -257,7 +268,7 @@ When asked to auto-fix CI, follow this loop:
 1. Check CI status → identify failures
 2. Read failure logs → understand the error
 3. Use `read_file` + `patch`/`write_file` → fix the code
-4. `git add . && git commit -m "fix: ..." && git push`
+4. `git add <the exact files you changed> && git commit -m "fix: ..." && git push` — never `git add .` in a repo with tracked build artifacts or bytecode, because it stages unrelated churn into the fix.
 5. Wait for CI → re-check status
 6. Repeat if still failing (up to 3 attempts, then ask the user)
 

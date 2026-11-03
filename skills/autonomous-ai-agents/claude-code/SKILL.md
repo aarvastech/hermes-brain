@@ -739,7 +739,10 @@ Use `/context` in interactive mode to see a colored grid of context usage. Key t
 10. **Slash commands (like `/commit`) only work in interactive mode** — in `-p` mode, describe the task in natural language instead.
 11. **`--bare` skips OAuth** — requires `ANTHROPIC_API_KEY` env var or an `apiKeyHelper` in settings.
 12. **Context degradation is real** — AI output quality measurably degrades above 70% context window usage. Monitor with `/context` and proactively `/compact`.
-13. **`-p` with no permission flag silently denies every Bash/Edit/Write and still exits 0** — you get a confident-sounding plan/result, not the actual change. Always add `--dangerously-skip-permissions` (isolated repo only) or equivalent, then verify by checking `permission_denials` in the JSON output and/or `git status`/running the tests yourself — do not report Claude Code's summary as done work until you've confirmed files actually changed.
+13. **`-p` with no permission flag silently denies every Bash/Edit/Write and still exits 0** — you get a confident-sounding plan/result, not the actual change. Always add `--dangerously-skip-permissions` (isolated repo only) or an equivalent narrower permission mode. A run counts as real work only when the JSON shows `is_error: false`, `terminal_reason: "completed"`, and an empty `permission_denials`, and `git status` shows the expected paths changed. A clean exit code is not evidence.
+14. **Background runs: `nohup … &` inside a foreground command is rejected by the terminal tool.** Start long runs with `terminal(background=true, notify=true, timeout=1800)`, redirect output to a file under `/tmp`, and read that file when the completion notification arrives.
+15. **A run that ends early (`is_error: true`, or `terminal_reason` other than `completed`, e.g. an account limit mid-task) leaves its edits uncommitted in the working tree.** Before re-delegating, read `git diff` and tell the new run to review and finish those edits. Restarting on a clean-tree assumption duplicates or conflicts with the partial work. An account-limit failure can still carry `subtype: "success"`, so judge the run by `is_error` and `terminal_reason`, never by `subtype`.
+
 
 ## Rules for Hermes Agents
 
@@ -773,10 +776,36 @@ Claude Code on a real project repo, apply this workflow by default:
    test** — not a transcript of the Claude Code session. Before reporting, confirm the
    delegated run actually executed (non-empty `git diff`/`git status`, tests you ran
    yourself) rather than trusting a confident-sounding JSON `result` field — see the
-   print-mode permission pitfall above.
+   print-mode permission pitfall above. Re-run the test command yourself; for suites with
+   async UI waits, run it 3–5 times, because a single green run can hide a timing flake and
+   the agent's self-report can say "all pass" while a rerun fails. Fix a flake by setting an
+   explicit timeout on the slow wait, not by retrying until green.
+
 6. **Before extending or rewriting an existing/inherited codebase**, do a discovery
    pass first: map what's implemented vs. partial vs. mock vs. missing against any
    spec/requirements doc, run the real test suite and quote actual pass/fail counts
    (never claim results without running them), and list what's reusable. Deliver that
    assessment before scaffolding a second/parallel implementation — a working system
    already in the repo is almost always the starting point, not a throwaway.
+7. **When a new ticket depends on a previous ticket's still-unmerged PR**, branch from that
+   PR's branch, not the default branch, and open the PR against it. Stacked-PR rules (base
+   branch, merge order, retargeting) are in the `github` skill's PR workflow, section 3a.
+
+8. **Scope each delegated task as a written ticket file committed to the repo first**
+   (e.g. `docs/tickets/<id>-<name>.md`) rather than only a prompt string — give it an
+   ID, goal, explicit in/out scope (name directories/files that must NOT change），
+   dependencies, acceptance criteria, a test plan, and the exact report format you
+   want back. A ticket Claude Code can `read in full` before coding produces far
+   tighter, more auditable diffs than a one-line instruction, and gives you a
+   checklist to verify against afterward instead of just reading the summary.
+   Tell it explicitly not to commit ("I will review and commit myself") so you keep
+   the chance to inspect the diff and drop unrelated noise before it enters history.
+9. **In an inherited repo with pre-existing git hygiene problems** (tracked `.pyc`
+   files, a committed `.venv`, regenerated lockfiles) running tests or installs will
+   dirty dozens of unrelated tracked files on every delegated run. Never `git add -A`
+   in that situation — stage only the exact new/changed paths the ticket scoped, and
+   diff-check the directories that must stay untouched (e.g. `git diff --stat --
+   <other-app-dir>/`) before committing, so a scoped feature commit doesn't silently
+   carry unrelated bytecode/lockfile churn.
+10. **Auth: Hermes never supplies an API key.** Claude Code runs on its own login. Confirm it with `claude auth status` (JSON; `authMethod` names the login type) before the first delegated run. Do not ask the user for an API key, and do not set `ANTHROPIC_API_KEY` for a delegated run.
+11. **A check counts as verified only after it has failed once.** For drift, contract or snapshot checks, make one deliberate change to the checked artifact, confirm the check fails, then restore it by regenerating (not by hand). A check that has only ever passed cannot be shown to catch the drift it claims to.

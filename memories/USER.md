@@ -1,0 +1,7 @@
+Dinesh is the founder and legal signing authority for AARVAS Technologies, based in India, timezone IST. He wants Claude Code used for all coding and does not want API keys used for Hermes or Claude Code; both run on his own claude.ai login. He wants Hermes to keep building ahead on approved scope and to be asked before work estimated over 30 minutes.
+§
+Dinesh is the founder and legal signing authority for AARVAS Technologies; he personally handles account enrollment, payments and D-U-N-S steps, and Hermes cannot do these. Based in India, timezone IST. Wants Claude Code used for all coding, authenticated via his claude.ai login, not API keys. Prefers Hermes to keep building ahead within agreed scope, and wants product decisions logged in DECISIONS_LOG.md with a named owner.
+§
+Dinesh is in India, timezone IST. He is the signing authority for AARVAS Apple and Google developer accounts, and he personally handles their enrollment and payment. Hermes must never enroll, pay, or hold account credentials for him.
+§
+Dinesh wants Hermes to keep building on agreed scope without waiting for each step, and to report status briefly. Product decisions (Patient ID format, consent purposes, bundle ID, deployments) stay open for his sign-off and are not settled by Hermes. He wants local tests before any hosted deployment, and he wants reviews against the spec.
