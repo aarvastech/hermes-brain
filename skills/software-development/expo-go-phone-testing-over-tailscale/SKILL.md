@@ -23,17 +23,23 @@ A phone must load an Expo dev-server bundle from this host, and the host must no
    the user's OK when it is more than about 30 minutes of work. Do not start Metro against a
    mismatched project and try to work around it.
 1. Check that both devices show as online in `tailscale status`. Use the host's 100.x address. Confirm reachability with `tailscale ping -c 2 <phone-ip>`. A relayed (DERP) path is acceptable for a smoke test.
-2. Start Metro on loopback only, with `--offline` and no `CI=1`, from the app directory: `NODE_OPTIONS="--require <scratch>/loopback-listen-shim.js" EXPO_PACKAGER_PROXY_URL=http://<tailscale-ip>:8081 EXPO_PUBLIC_<API>_URL=http://<tailscale-ip>:<api-port> npx expo start --offline --port 8082`. Run it under `script -q -f -c "..." <logfile>` so Expo gets a pseudo-TTY. Start it as background=true, not with nohup.
+2. Start Metro on loopback only, signed in to Expo (step 2a), with no `--offline` and no `CI=1`, from the app directory: `NODE_OPTIONS="--require <scratch>/loopback-listen-shim.js" EXPO_PACKAGER_PROXY_URL=http://<tailscale-ip>:8081 EXPO_PUBLIC_<API>_URL=http://<tailscale-ip>:<api-port> npx expo start --port 8082`. Run it under `script -q -f -c "..." <logfile>` so Expo gets a pseudo-TTY. Start it as background=true, not with nohup.
+2a. **Sign in to Expo before starting Metro.** SDK 58 needs a signed manifest, and `--offline` cannot sign one. Follow `references/headless-expo-login.md`. The user completes the browser step with their own account.
 3. Forward the tailnet address to loopback: `socat TCP-LISTEN:8081,bind=<tailscale-ip>,fork,reuseaddr TCP:127.0.0.1:8082`.
 4. Verify with `ss -ltn` that the API and the forwarder listen only on the tailscale address, and that Metro listens only on 127.0.0.1. Verify with curl that the public address refuses those ports.
-5. Verify the manifest over the tailnet with `Accept: multipart/mixed,application/expo+json,application/json`, `expo-platform: ios`, and `Expo-Accept-Signature: true`. Expect HTTP 200. Then fetch the bundle URL from the manifest. The first build takes about 30s; a warm build about 5s. Warm it before the phone asks: fetch the
+5. Verify the manifest over the tailnet with `Accept: multipart/mixed,application/expo+json,application/json`, `expo-platform: ios`, and `Expo-Accept-Signature: true`. Expect HTTP 200. A 200 does not prove the manifest is signed, so also check the Metro log for `unable to sign manifest`. Then fetch the bundle URL from the manifest. The first build takes about 30s; a warm build about 5s. Warm it before the phone asks: fetch the
    bundle URL from the manifest with curl. Otherwise the phone shows "The request timed out" while
    the host is still building.
 6. On the phone, open `exp://<tailscale-ip>:8081` from Notes. Expo Go's own server list does not discover tailnet addresses.
 
+## SDK upgrades
+If the SDK must change to match the phone, follow `references/sdk-major-upgrade.md`. Restart Metro after the upgrade; the old process keeps serving the previous SDK.
+
 ## Pitfalls
+- After the first successful load, Expo Go shows a "Development mode" notice. It is normal. Dismiss it; it is not an error.
 - Expo's CLI calls `httpServer.listen(port, undefined)`, which binds all interfaces, and `--localhost`/`--host` do not change that. The loopback shim pins that one call to 127.0.0.1. Keep the shim in the scratch dir, not the repo.
 - `CI=1` or stdin from `/dev/null` makes Expo non-interactive. The phone then sees HTTP 500 "Input is required, but 'npx expo' is in non-interactive mode".
-- Without `--offline`, Expo asks "Log in / Proceed anonymously" on the server terminal. The phone then sees "The request timed out". Choosing an account is the user's decision, so use `--offline` instead.
+- `--offline` does not work on SDK 58. Metro logs "Offline and no cached development certificate found, unable to sign manifest", and the phone shows "You need to be signed in to Expo Go". Use a signed-in Expo session. Without `--offline`, Expo asks "Log in / Proceed anonymously" on the server terminal, and the phone sees "The request timed out" until the prompt is answered. Choosing an account is the user's decision.
+- `npx expo login` needs a terminal (run it under `script -q -f -c "npx expo login" <log>`). Set `BROWSER=none` so the CLI does not call `xdg-open`, which is missing on headless hosts and crashes it. Then ask the user to open the printed link through an SSH tunnel to that link's callback port (`ssh -L <port>:localhost:<port> <host>`). The port changes on each run, so use the one in the current link. Steps: `references/headless-expo-login.md`. Never take credentials or tokens in chat.
 - Phone error "There was a problem running the requested project": check the Metro log first.
 - Never bind the API or Metro to the public interface. Dev-auth bypass accepts a fixed OTP, so the port must stay private.

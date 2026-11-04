@@ -25,7 +25,7 @@ sudo -n systemctl enable --now tailscaled
 sudo -n tailscale up --accept-dns=false --hostname=<short-host-name> --timeout=20s
 ```
 
-`tailscale up` prints a login URL and then times out while it waits. The URL belongs to the
+`tailscale up` prints a login URL and then times out while it waits. Without `sudo`, the same command fails with `checkprefs access denied`. Run it with `sudo`, or run `sudo tailscale set --operator=$USER` once so later commands work without it. The URL belongs to the
 user's account, so the user opens it. Do not complete it on the user's behalf. If the URL expires,
 run the command again for a fresh one. Once the user confirms, check with:
 
@@ -106,6 +106,7 @@ The `launchAsset` URL must use the overlay address, not loopback.
 - Match the project's SDK to the Expo Go on the phone before starting anything. The App Store
   build is the current SDK only, so a project on an older SDK shows "Project is incompatible with
   this version of Expo Go". See the Expo skill's SDK check.
+- If the phone shows "You need to be signed in to Expo Go and Expo CLI", the host served an unsigned manifest. Sign the CLI in on the host first (the Expo skill, step 2a). Do not work around it with `--offline`.
 - Use only synthetic test identifiers (for example `+1555...` numbers and a dev code).
 
 ## 6. Stop

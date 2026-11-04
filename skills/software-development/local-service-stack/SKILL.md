@@ -97,6 +97,10 @@ it does not need the hosted-deployment approval. See `references/phone-access-ov
 - **Keep the packager and the forwarder on different ports.** Some dev servers refuse to start
   when another process already holds their default port, even if that process is only a
   forwarder. Run the server on a free port and point the forwarder at it.
+- **Choose hosting only in-country when the user is in India.** Any option that moves data off the
+  local machine (a VM, managed database, object store, or a third-party sign-in) must be an India
+  region, and a non-India vendor must be called out before use. Patient and personal data stays in
+  India, and a development build that calls an overseas service is for testing only, never for real data.
 - **Smoke-test data is local only.** Use synthetic identifiers such as `+1555...` numbers and
   placeholder names. Never use real customer or patient data here, even for a quick check.
 
