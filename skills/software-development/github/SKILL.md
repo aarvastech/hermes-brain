@@ -44,6 +44,16 @@ Supporting assets: `scripts/gh-env.sh` + `scripts/git-credential-token.py`
   porcelain lacks (the cheatsheet lists them).
 - Never report CI green without checking `gh pr checks` yourself; never
   claim merged without verifying `state,mergedAt`.
+- Before posting any branch or commit link, confirm the remote has it: `git ls-remote origin <branch>`
+  must return the same SHA as `git rev-parse <branch>`. A commit that exists only locally produces a
+  link that does not resolve. A delegated run's claim that it pushed is not evidence, so run this check
+  yourself.
+- When the reviewer asks to hold a PR, open it with `gh pr create --draft` and say in the body what it
+  is waiting for. On repos with no CI status checks, commit the test output to the branch as a file so
+  the reviewer has the record with the PR.
+- Stop tracking a file that is already gitignored with `git rm -r --cached <path>`. This keeps
+  the file on disk. Do not delete it, and do not rewrite history unless the user approves that
+  separately.
 - Read full context before writing: `gh issue view --comments` /
   `gh pr view --comments` — decisions live in threads, not titles.
 - Sweep for duplicates before creating anything:

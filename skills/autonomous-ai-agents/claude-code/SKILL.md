@@ -741,7 +741,11 @@ Use `/context` in interactive mode to see a colored grid of context usage. Key t
 12. **Context degradation is real** — AI output quality measurably degrades above 70% context window usage. Monitor with `/context` and proactively `/compact`.
 13. **`-p` with no permission flag silently denies every Bash/Edit/Write and still exits 0** — you get a confident-sounding plan/result, not the actual change. Always add `--dangerously-skip-permissions` (isolated repo only) or an equivalent narrower permission mode. A run counts as real work only when the JSON shows `is_error: false`, `terminal_reason: "completed"`, and an empty `permission_denials`, and `git status` shows the expected paths changed. A clean exit code is not evidence.
 14. **Background runs: `nohup … &` inside a foreground command is rejected by the terminal tool.** Start long runs with `terminal(background=true, notify=true, timeout=1800)`, redirect output to a file under `/tmp`, and read that file when the completion notification arrives.
-15. **A run that ends early (`is_error: true`, or `terminal_reason` other than `completed`, e.g. an account limit mid-task) leaves its edits uncommitted in the working tree.** Before re-delegating, read `git diff` and tell the new run to review and finish those edits. Restarting on a clean-tree assumption duplicates or conflicts with the partial work. An account-limit failure can still carry `subtype: "success"`, so judge the run by `is_error` and `terminal_reason`, never by `subtype`.
+15. **A run that ends early (`is_error: true`, or `terminal_reason` other than `completed`, e.g. an account limit mid-task) leaves its edits uncommitted in the working tree.** Before re-delegating, read `git diff` and tell the new run to review and finish those edits. Restarting on a clean-tree assumption duplicates or conflicts with the partial work.
+16. **Put every required behaviour in the brief before launch.** The run tests only what the brief names, so a requirement left out of the brief yields a green suite without that behaviour. Before launching, check the brief line by line against the full requirements list, and require a named test for each requirement.
+17. **An inherited repo's committed `.venv` from another OS is unusable.** Create a venv outside the repo (for example `/tmp/<name>-venv`), install only the test dependencies, and run `python -m pytest <tests> -p no:cacheprovider` from the repo root so no cache directories are written into the tree. Tell the run which interpreter to use, so its result can be traced to one environment. An account-limit failure can still carry `subtype: "success"`, so judge the run by `is_error` and `terminal_reason`, never by `subtype`.
+18. **A background-run completion notification only means the process exited.** It says nothing about whether the work is correct. Before reporting, read the run JSON (`is_error`, `terminal_reason`, `permission_denials`), list the new commits with `git log <base>..<branch>`, and rerun the test command yourself.
+19. **A brief that requires a safety guard needs a source-scan test, not only behaviour tests.** When a simulated action must never be presented as a real one, name the forbidden phrases in the brief and require a test that scans the source and output for them. Behaviour tests exercise only the paths they call, while a scan catches wording added anywhere else.
 
 
 ## Rules for Hermes Agents
@@ -800,6 +804,10 @@ Claude Code on a real project repo, apply this workflow by default:
    checklist to verify against afterward instead of just reading the summary.
    Tell it explicitly not to commit ("I will review and commit myself") so you keep
    the chance to inspect the diff and drop unrelated noise before it enters history.
+   List every dependency change the run may make, by exact package name and purpose, in the
+   ticket. A run that finds an unlisted package stops and reports a blocker, so it can't add one
+   silently. Get the founder's approval of that list first, and copy the approved names into the
+   ticket.
 9. **In an inherited repo with pre-existing git hygiene problems** (tracked `.pyc`
    files, a committed `.venv`, regenerated lockfiles) running tests or installs will
    dirty dozens of unrelated tracked files on every delegated run. Never `git add -A`

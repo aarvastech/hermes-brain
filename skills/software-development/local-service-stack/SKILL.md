@@ -30,9 +30,16 @@ it does not need the hosted-deployment approval. See `references/phone-access-ov
 
 ## Procedure
 
+0. **Public-exposure preflight before proposing any DNS or firewall change.** Follow `references/public-exposure-preflight.md`: resolve the hostname, confirm which host answers, list listeners and firewall policy, and propose exact changes only after that.
+
 1. **Pre-flight.** Check `docker info`. Check which interfaces are routable with
    `ip -4 -o addr show`. Note the repo's tracked env files by name only. Do not read their
    contents and do not reuse their values.
+   On a host that already runs another service (including the agent itself), also run `ss -ltn`,
+   `docker ps`, `free -h` and `df -h` before proposing a second stack. Give the new stack its own
+   compose project, network, volume and service user. Do not read or change the other service's
+   config or secrets. The other service's host access is the blast radius for any mistake in the new
+   stack.
 
 2. **Secrets go outside the repo.** Create a scratch dir under
    `~/.hermes/cache/scratch/<stack-name>/` with mode 700. Generate each password with
@@ -103,6 +110,9 @@ it does not need the hosted-deployment approval. See `references/phone-access-ov
   India, and a development build that calls an overseas service is for testing only, never for real data.
 - **Smoke-test data is local only.** Use synthetic identifiers such as `+1555...` numbers and
   placeholder names. Never use real customer or patient data here, even for a quick check.
+
+- **A hostname may already serve a live site on another host.** Resolve the name before proposing a record. Creating or moving it can take a live service offline.
+- **Validate compose files with placeholder values in the shell only.** Run `export VAR=placeholder` then `docker compose -p <project> -f <file> config --quiet`. Check that the published-port list shows only the intended public listener. Never write the placeholder into a tracked file.
 
 ## Verification
 Done means: containers report ready, migrations exit 0, the API answers 401 with no token,
