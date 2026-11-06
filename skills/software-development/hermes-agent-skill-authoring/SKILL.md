@@ -75,6 +75,7 @@ metadata:
 - No marketing words ("powerful", "comprehensive", "seamless", "advanced").
 - The system prompt skill index truncates at 57 chars + "..." — the trigger/capability must be self-contained in that window.
 - If the description contains a `:`, wrap it in double quotes or YAML parses it as a mapping and the docs generator crashes. Quotes don't count toward the 60.
+- The same limits apply to user-local skills written with `skill_manage`: it rejects a description over 60 characters or with an unquoted colon, and rolls back the whole batch. Check both before calling it.
 
 Good: `Track named companies for material news with cited digests.`
 Bad: `Use when a user asks to monitor named competitors or companies for product launches, pricing changes, funding, ...` (240 chars — rejected in review)

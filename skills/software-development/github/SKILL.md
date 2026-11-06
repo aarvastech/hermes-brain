@@ -54,6 +54,9 @@ Supporting assets: `scripts/gh-env.sh` + `scripts/git-credential-token.py`
 - Stop tracking a file that is already gitignored with `git rm -r --cached <path>`. This keeps
   the file on disk. Do not delete it, and do not rewrite history unless the user approves that
   separately.
+- Write PR and issue bodies to a file and pass `--body-file`. Inline `--body` with backticks, quotes or `$` gets mangled by shell quoting, and a mangled body reads as a wrong claim. After any push, re-read the body and check any head hash it cites against `gh pr view <n> --json headRefOid`.
+- `gh pr view --json mergeable` often returns `UNKNOWN` for a short time after a push. Re-query after a few seconds before reporting a conflict or a clean merge. A status read straight after a push is not evidence.
+- If `gh pr edit --body-file` exits 0 but the body does not change, set it with `gh api -X PATCH repos/<owner>/<repo>/pulls/<n> -F body=@<file>` and read it back. A GraphQL deprecation warning in the `gh pr edit` output (for example about Projects classic) means the edit was not applied, so go straight to the API route. Check the body after any edit, whichever command you used.
 - Read full context before writing: `gh issue view --comments` /
   `gh pr view --comments` — decisions live in threads, not titles.
 - Sweep for duplicates before creating anything:

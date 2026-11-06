@@ -108,6 +108,8 @@ it does not need the hosted-deployment approval. See `references/phone-access-ov
   local machine (a VM, managed database, object store, or a third-party sign-in) must be an India
   region, and a non-India vendor must be called out before use. Patient and personal data stays in
   India, and a development build that calls an overseas service is for testing only, never for real data.
+- **Staging a compose stack that has a public reverse proxy.** A bare `docker compose up -d` also starts the proxy, which publishes 80 and 443 and exposes the stack before DNS and firewall approval. Name the internal services explicitly (`up -d <db> <cache> <auth>`), then check the published-port list in `docker ps` before going further.
+- **A config file is not live until the running service loads it.** Some services import data files only on first start. Keycloak's `--import-realm` skips an edited realm file when the realm already exists in its database volume, so a restart looks applied but is not. Verify the running service through its API after any change. Checks are in `references/keycloak-realm-checks.md`.
 - **Smoke-test data is local only.** Use synthetic identifiers such as `+1555...` numbers and
   placeholder names. Never use real customer or patient data here, even for a quick check.
 

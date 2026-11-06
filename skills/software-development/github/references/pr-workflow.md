@@ -145,6 +145,7 @@ Use when a change needs code from another open PR that has not merged yet.
 - Check scope before opening: `git diff --stat origin/<parent-branch>...HEAD` must list only the child's own files.
 - Audit every open stack's bases before merging anything: `gh pr list --state open --json number,headRefName,baseRefName`. A base that points at a branch which will be deleted or merged first must be retargeted before that merge.
 - Merge parent-first. After the parent merges, retarget the child with `gh pr edit <child> --base main`, then re-check that the diff is only the child's work.
+- A fix pushed to a parent branch does not reach its child PRs. The child's PR head stays at the old commit, so reviewers read stale code. After each parent change, merge or rebase the parent into each child, push the child, and check `gh pr view <child> --json headRefOid` equals `git rev-parse <child>`. Do this before telling anyone the stack is updated.
 - If the child needs a sibling's files that the parent does not have yet (for example a generated snapshot), merge that sibling branch into the child and say so in the body. The PR diff carries those files until the sibling merges, so name them.
 
 ## 4. Monitoring CI Status

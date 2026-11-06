@@ -62,6 +62,7 @@ already has the product, and how to differ, before writing code.
 
 ## Pitfalls
 
+- Check the team's own existing modules and products against the incumbent list before proposing to extend them. A module that duplicates an incumbent's core function (a records locker, an identity-and-ABHA style record) is a stop signal, not a base to reuse, because reuse inherits the duplication. Ask the owner before extending it.
 - Do not copy the incumbent's core feature set. When a government app already offers a function
   for the same users (records, ABHA, locker), integrate with it or differentiate on the gaps.
 - Do not trust a single snippet for a feature claim. Confirm it on the vendor page or the store listing.
