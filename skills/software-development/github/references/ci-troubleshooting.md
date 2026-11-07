@@ -156,6 +156,17 @@ COPY failed: file not found in build context
 
 ---
 
+## No CI Run Appears On A PR
+
+A PR can have no checks at all for two reasons, and both look like "CI passed" when you only read the checks list:
+
+- **The workflow file is not on the PR's head branch.** A `pull_request` workflow runs from the branch's own copy of `.github/workflows/`. Check with `git ls-tree <head-sha> .github/workflows/`. If the file is missing there, merge the base into the branch (`git merge origin/main`) and push. The push starts the run.
+- **The PR is still a draft, or was opened before the workflow existed.** Run `gh run list --branch <branch>` and confirm a run exists for the current head SHA before reporting CI status. An empty list means no check ran, not that checks passed.
+
+Read the final run with `gh run view <id> --json conclusion,jobs`, then check the job log for the test-count line. A green conclusion with a skipped-count you did not expect means the skip condition (a missing service URL) still applies in CI.
+
+---
+
 ## Auto-Fix Decision Tree
 
 ```

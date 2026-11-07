@@ -31,7 +31,7 @@ Use this when deciding how a system is structured, what each part owns, how part
 - **Events and workflows are data, not hardcoded flows.** Timeouts and escalation paths come from configuration. Every event records owner, timeline and resolution.
 - **Clinical logic needs sign-off.** Thresholds and automated actions carry a flag until a qualified clinician approves them. Never present a notification as a dispatch.
 - **Keep the demo on production code.** A demo is a configuration and data setting, not a separate product.
-- **Hosting:** isolate the stack (network, database, service user, volumes). Only the reverse proxy is public. Admin and database ports stay private. Backups and a restore test come before go-live. Rollback is a tagged previous image.
+- **Hosting:** isolate the stack (network, database, service user, volumes). Only the reverse proxy is public. Admin and database ports stay private. Backups and a restore test come before go-live. Rollback is a tagged previous image. For the DNS-switch order, firewall checks and go-live gate, see references/isolated-stack-hosting.md.
 - **India context for health and identity:** check data-localisation and consent requirements (DPDP Act, ABDM rules) before storing real data; pick an Indian hosting region for real patient data.
 
 ## Review checklist

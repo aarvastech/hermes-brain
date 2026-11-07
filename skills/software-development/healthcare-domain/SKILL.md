@@ -23,6 +23,7 @@ Use this for patient records, clinical workflows, emergency response, lab orders
 
 - A notification is not an action. Never imply an ambulance, doctor or pharmacy has been dispatched or has accepted unless a real system confirmed it.
 - Clinical thresholds (SpO2, heart rate, blood pressure, fall timing) are configuration. They need a named clinician's sign-off before real use. Until then, flag every event as demo-only.
+- Physiological thresholds need a registered physician (MBBS), ideally with geriatrics, emergency or critical-care experience. A dentist or other non-physician qualification does not qualify. Record the approver in the decision log with the sign-off date. For the role's duties, qualifications, independence rules and the approval record fields, see references/clinical-approver-role.md.
 - AI may draft notes, summarise history and suggest checks. It must not diagnose, prescribe, or change treatment. A clinician approves every draft before it enters the record.
 - Show time and source for every clinical value. Stale data must look stale.
 - Missing data is not normal data. Show "not recorded" rather than zero.

@@ -44,6 +44,7 @@ Supporting assets: `scripts/gh-env.sh` + `scripts/git-credential-token.py`
   porcelain lacks (the cheatsheet lists them).
 - Never report CI green without checking `gh pr checks` yourself; never
   claim merged without verifying `state,mergedAt`.
+- Before `git checkout` of a branch in a clone that tracks generated files, check `git status --short`. Tracked `__pycache__` or other generated-file changes block the checkout. Save them to a tar first, then restore those paths with `git checkout -- <paths>`. Only do this after you confirm no non-generated changes exist.
 - Before posting any branch or commit link, confirm the remote has it: `git ls-remote origin <branch>`
   must return the same SHA as `git rev-parse <branch>`. A commit that exists only locally produces a
   link that does not resolve. A delegated run's claim that it pushed is not evidence, so run this check
@@ -59,6 +60,11 @@ Supporting assets: `scripts/gh-env.sh` + `scripts/git-credential-token.py`
 - If `gh pr edit --body-file` exits 0 but the body does not change, set it with `gh api -X PATCH repos/<owner>/<repo>/pulls/<n> -F body=@<file>` and read it back. A GraphQL deprecation warning in the `gh pr edit` output (for example about Projects classic) means the edit was not applied, so go straight to the API route. Check the body after any edit, whichever command you used.
 - Read full context before writing: `gh issue view --comments` /
   `gh pr view --comments` — decisions live in threads, not titles.
+- A PR showing `MERGED` does not prove the change reached the target branch. After any merge, fetch and check `git merge-base --is-ancestor <merge-commit> origin/<base>`. Merging a stacked PR into its parent branch lands nothing on main.
+- Before merging a PR whose base is not `main`, retarget it with `gh pr edit <n> --base main`, then read `baseRefName` back and stop unless it says `main`. Do not hide the command's output: a failed retarget that goes unseen merges into the wrong branch.
+- For a stack, either retarget and merge each PR bottom-up, or open one PR from the top branch into main after confirming every stack head is an ancestor of it.
+- Pushing a change under `.github/workflows/` needs the token's `workflow` scope; GitHub rejects the push without it. Reading Actions runs needs `actions:read` and reading check status needs `checks:read`. A 403 names the missing scope; ask the owner to add it, then retry.
+- Inside a loop over several PRs, stop on the first failed state change (`set -e`, or check `$?` after each one). Do not silence state-changing commands with `>/dev/null 2>&1` in a loop that keeps going: a later PR then merges into the wrong parent.
 - Sweep for duplicates before creating anything:
   `gh pr list --search` / `gh issue list --search`.
 

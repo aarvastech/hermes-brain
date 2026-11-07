@@ -35,8 +35,11 @@ Use this before telling the user anything is done. Agents such as Claude Code re
 - A passing suite does not prove a workflow works end to end. Trace one real path from the entry point to the stored result.
 - Read the exit code of the real command, not of a pipeline. `cmd | tail` returns tail's status. Write output to a file and read `$?` from the command itself, or set `set -o pipefail`.
 - A mutation run that turns tests red is not a bug. It shows the guard is covered. Only treat a failure as a bug when the unmutated suite fails.
-- A green count with skips needs the reason for each skip. Run the skipped backend (for example PostgreSQL) once with its URL set before claiming the count, and remove any throwaway container afterwards.
+- A green count with skips needs the reason for each skip. Run the skipped backend (for example PostgreSQL) once with its URL set before claiming the count, and remove any throwaway container afterwards. The gated backend's passed count must reconcile: passed there equals passed on the default backend plus the skipped count. If it does not, a test depends on the backend, so resolve that before reporting the count.
+- Enumerate skips from a machine-readable report, not from `grep` on console output: run with `--junitxml=<file>` and read each skipped element with its message. Console grep on `-rs` output has missed entries (a summary of 42 skips once showed 24 matching lines), so explain every skipped element before reporting the count.
 - A skip count that changes between runs means a new test added a backend-gated skip. Find it with `grep -rn "skip" <test dirs>` (the `-rs` flag prints reasons, but grep finds the new case) before accepting the count.
+- A CI checkout is shallow by default. Tests that read git history (for example a migration that rebuilds an earlier schema from a commit) skip silently. Set `fetch-depth: 0` on the checkout, and run pytest with `-rs` so every skip prints its reason.
+- `pytest.importorskip("x")` turns a missing dev dependency into a skip, not a failure, and the whole test module disappears from the pass count. When a CI run skips a backend that passed locally, check that every module imported by the tests is declared in the project's dev extras. A local venv that happens to have the package hides the gap.
 - Parametrise coverage checks over the app's route table, not over a hand-written list, and assert the table itself is complete. A hand-written list silently misses any route added later.
 - Check which branch the working tree is on after any delegated run. A failed run can leave it on a different branch, and a later commit then lands in the wrong place.
 - A check-then-write that runs outside the write transaction passes every sequential test and fails only under concurrency. For each status or state transition, run two transitions on the same record at once (asyncio.gather or threads, on the real database backend). Assert that one succeeds, the other gets a conflict error, and exactly one set of side-effect rows exists (events, audit rows, notifications).
@@ -46,7 +49,21 @@ Use this before telling the user anything is done. Agents such as Claude Code re
 - Clear unrelated generated-file changes (bytecode, lockfiles) before a rebase. They block it, and they should not be committed. Restore them with `git checkout --` for the specific paths, after checking they are generated.
 - Apply each mutation with a script that asserts the replacement count (for example `assert s.count(old) == 1`) before rerunning tests. An unmatched replacement leaves the code unmutated, and the suite then passes for the wrong reason.
 - Before deleting a git worktree, move the shell out of it or pass `workdir` on every call. A shell left inside a removed worktree fails every later command, so the check looks broken when it is not.
+- A background run's completion only means the process exited. Read its result record and check `is_error` and `subtype` before trusting the summary. A usage or rate-limit error can exit cleanly with the error text in `result`.
+- Do not say a job is running until the tool call that starts it has been issued. Until then, say "not started". After it starts, report its state as issued and pending until you have read its output. Also do not report a job as finished, or a merge as done, before reading its result record and the state it should have produced.
+- A PostgreSQL container that answers one readiness probe is not ready: the server restarts during initialisation. Require several consecutive successful `select 1` queries before running tests.
+- A PR description reports the head it was verified at, and mergeability can read UNKNOWN or stale right after a push. Recheck after a short wait. Treat it as a conflict only when a file conflict or a failing base comparison shows it.
+- Never discard the output of a command that changes state: merges, retargets, pushes, deletes. A command that fails silently still lets the next step run. Read its result, then verify the state it should have produced (for example `gh pr view <n> --json baseRefName,state` and `git ls-remote origin <branch>`). After a merge, check that the code is on the target branch itself, not on a parent branch.
+- Before reporting a merge as complete, check the target branch. A PR can show MERGED with its code landing in a stacked parent. See references/stacked-prs-and-github-access.md in full-stack-developer.
+- Use the tool's background flag (`background=true`) for long jobs, not a trailing `&` in a foreground command. The foreground rejects `&` and the job never starts. Foreground calls also time out near the tool limit (about seven minutes), so poll a background job in short calls instead of one long sleep.
 - QA reports; the owner decides. Do not merge or push to main from QA.
+
+## Status reporting
+
+- Say explicitly when nothing is running. A message that lists earlier work without saying it is finished reads as still in progress.
+- Lead with the verified result and its exact command or count. Put unverified claims after it, labelled as unverified.
+- Name each blocker and the one person who can clear it, with the exact action needed (for example the token scope to add). Do not stop at "blocked".
+- When an earlier message in the conversation was wrong, correct it in the next message in one sentence, before the new status. Do not let it stand because the new status is correct.
 
 ## Output format
 

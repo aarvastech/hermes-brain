@@ -26,7 +26,7 @@ For each feature, answer:
 - **Injection:** parameterised queries only. No string-built SQL.
 - **Files:** type and size checks, scan before storage, store outside the web root, encrypt at rest for health documents, signed short-lived download links.
 - **Sessions and tokens:** short-lived access tokens, refresh handling on mobile in secure storage, logout revokes the session.
-- **Secrets:** environment or secret store only. Never in git, logs or client bundles. Rotate any secret that was ever committed.
+- **Secrets:** environment or secret store only. Never in git, logs or client bundles. Rotate any secret that was ever committed. Keep local secret files outside the repo at mode 600, and load them into the process environment. Never echo their values into chat, logs or command output.
 - **Logging:** log who did what and when. Never log tokens, passwords, or health content. Audit rows hold no payloads.
 - **Dependencies:** pin versions, run a vulnerability audit before release, remove unused packages.
 - **Client:** no secrets in the app bundle; certificate pinning only if a threat model requires it; disable debug and dev menus in release builds.
@@ -36,6 +36,10 @@ For each feature, answer:
 - Only the reverse proxy is public, on 80 and 443 with TLS (Let's Encrypt). SSH restricted to known addresses or the tailnet.
 - Database, cache and admin consoles bind to private networks or loopback only. Check with a port scan from outside before any go-live.
 - Firewall default deny, with explicit allow rules written down.
+- Forwarded client addresses: trust `X-Forwarded-For` only when the direct peer is a known proxy address. Take the rightmost entry that the proxy added, not the leftmost, because a client can supply any leftmost value. The proxy must overwrite the header, not append to it. Caddy: `header_up X-Forwarded-For {remote_host}`.
+- Shared limits: counters that live in one process give each worker its own limit. Keep them in a shared store (Redis) on a private network with a password from the environment and no published port. A limit check on a protected operation fails closed (503 and no write) when the store is unreachable, logs the error class without the connection URL, and never falls through to allow.
+- Safety-critical operations during a store outage are not covered by the fail-closed rule for logins and writes, because blocking them can stop a patient alert. Use the designated-fallback pattern in references/rate-limit-degradation.md, with its limits, audit and recovery rules.
+- Expose a no-detail health endpoint (200 when the store responds, 503 otherwise) and state in the security review that an external monitor must poll it.
 - Patch the OS and containers on a schedule. Keep a restore test for backups.
 - Separate service users per application. No root containers unless required.
 
@@ -45,7 +49,10 @@ For each feature, answer:
 - Replay an expired, wrong-audience or wrong-issuer token and expect rejection.
 - Try cross-patient reads and writes with a valid token for another patient.
 - Check every write route for audit rows.
+- Shared-state controls (rate limits, sessions, locks) need two application instances against one real store in the test. A single instance with an in-memory store cannot show that a limit set in one process applies to the other, and it hides the per-process counter bug.
+- Test the failure path of each shared store: stop it, then confirm the protected operation returns the fail-closed error and writes nothing.
 - Run a dependency vulnerability scan and record the result.
+- For live identity checks (roles, audience, token claims, user profile), follow references/keycloak-realm-checks.md. Create any test identity with a random secret, remove it and restore every flag in the same command.
 
 ## Incident response
 
