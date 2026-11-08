@@ -20,6 +20,8 @@ Use this when deciding how a system is structured, what each part owns, how part
 5. **Write an ADR:** context, decision, alternatives rejected and why, consequences, reversal cost, owner, status (approved, proposed, open).
 6. **Set a check:** how we will know it was the right call (a test, a metric, or a review date).
 
+For a full multi-section blueprint (inventory, competitor matrix, build/integrate/partner, IP register, roadmap), read `references/architecture-blueprint.md` first.
+
 ## Rules for systems that hold personal or health data
 
 - **One source of truth per fact.** One patient identity, one timeline. Roles are access rules on shared data, not separate databases per role.

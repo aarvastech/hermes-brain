@@ -3,3 +3,5 @@ Dinesh is founder and legal signing authority for AARVAS Technologies (India, IS
 Dinesh wants Hermes to keep building on agreed scope without waiting for each step. Ask only for mandatory approvals: purchases, production changes, credentials and clinical sign-off. He wants independent reruns and evidence, not agent claims. The summit demo runs the production code, not a separate demo product.
 §
 Dinesh does not accept probe-table, empty-database or synthetic-only checks as completion of backup/restore work; restore evidence must cover the full schema and check row counts and constraints.
+§
+AI work: synthetic data only; USD 50/month model cap, no auto-increase; approval before paid services. Dinesh alone creates and funds vendor accounts; Hermes never adds payment methods.

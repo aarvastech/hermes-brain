@@ -65,6 +65,10 @@ Supporting assets: `scripts/gh-env.sh` + `scripts/git-credential-token.py`
 - For a stack, either retarget and merge each PR bottom-up, or open one PR from the top branch into main after confirming every stack head is an ancestor of it.
 - Pushing a change under `.github/workflows/` needs the token's `workflow` scope; GitHub rejects the push without it. Reading Actions runs needs `actions:read` and reading check status needs `checks:read`. A 403 names the missing scope; ask the owner to add it, then retry.
 - Inside a loop over several PRs, stop on the first failed state change (`set -e`, or check `$?` after each one). Do not silence state-changing commands with `>/dev/null 2>&1` in a loop that keeps going: a later PR then merges into the wrong parent.
+- A shared clone is one working tree. `git checkout` or `checkout -B` to another branch deletes tracked files that the target branch does not track, even files you still need on disk. For parallel branches, use `git worktree add <path> <branch>` and remove the worktree when done. Before any switch, list the tracked env and config files.
+- After a `.gitignore` change, check each pattern with `git check-ignore -v <path>`. A broad pattern such as `.env.*` also matches `.env.example` unless the example files are negated.
+- After `git rm --cached`, confirm the result with `git ls-files <path>`. A multi-path command can stop partway and print nothing.
+- For a scope check, use `git diff --name-status origin/<base>...origin/<head>`. `gh pr diff --name-only` can return an empty list without an error.
 - Sweep for duplicates before creating anything:
   `gh pr list --search` / `gh issue list --search`.
 

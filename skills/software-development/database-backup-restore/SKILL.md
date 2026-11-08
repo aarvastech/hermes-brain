@@ -48,4 +48,5 @@ Use for a PostgreSQL database in a Docker container when backups must be schedul
 
 ## References
 
+- Credential rotation (finding every consumer before changing a database password): `references/credential-rotation.md`.
 - `scripts/`: none yet. Keep the backup, status and restore-test commands in one script with subcommands, and copy it to a stable host path (not the repo worktree) for cron.
