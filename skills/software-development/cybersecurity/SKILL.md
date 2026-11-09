@@ -27,6 +27,7 @@ For each feature, answer:
 - **Files:** type and size checks, scan before storage, store outside the web root, encrypt at rest for health documents, signed short-lived download links.
 - **Sessions and tokens:** short-lived access tokens, refresh handling on mobile in secure storage, logout revokes the session.
 - **Secrets:** environment or secret store only. Never in git, logs or client bundles. Rotate any secret that was ever committed. Keep local secret files outside the repo at mode 600, and load them into the process environment. Never echo their values into chat, logs or command output.
+- **Private keys are secrets.** A private key that has left the machine it was generated on, by any channel (chat, scp, upload, pasted text), is compromised and must be replaced. Do not use it to log in, even when the owner offers it. Install only the public key on servers.
 - **Logging:** log who did what and when. Never log tokens, passwords, or health content. Audit rows hold no payloads.
 - **Dependencies:** pin versions, run a vulnerability audit before release, remove unused packages.
 - **Client:** no secrets in the app bundle; certificate pinning only if a threat model requires it; disable debug and dev menus in release builds.
@@ -34,6 +35,7 @@ For each feature, answer:
 ## Server and network
 
 - Only the reverse proxy is public, on 80 and 443 with TLS (Let's Encrypt). SSH restricted to known addresses or the tailnet.
+- Before publishing a new hostname on 80 and 443: check `ss -tlnp` for port conflicts, open only those two ports with a commented `ufw allow`, bind the application itself to loopback, and confirm the certificate with `openssl s_client` after issuance.
 - Database, cache and admin consoles bind to private networks or loopback only. Check with a port scan from outside before any go-live.
 - Firewall default deny, with explicit allow rules written down.
 - Forwarded client addresses: trust `X-Forwarded-For` only when the direct peer is a known proxy address. Take the rightmost entry that the proxy added, not the leftmost, because a client can supply any leftmost value. The proxy must overwrite the header, not append to it. Caddy: `header_up X-Forwarded-For {remote_host}`.
@@ -42,6 +44,9 @@ For each feature, answer:
 - Expose a no-detail health endpoint (200 when the store responds, 503 otherwise) and state in the security review that an external monitor must poll it.
 - Patch the OS and containers on a schedule. Keep a restore test for backups.
 - Separate service users per application. No root containers unless required.
+- Host identity: before accepting an SSH host key, compare its fingerprint with the value the server reports on its own console (`ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`). Never use `StrictHostKeyChecking=accept-new` or `no` against a production host.
+- Installing a key: `scp file ~/.ssh/authorized_keys` replaces the whole file and removes every other key and its access. Append with `ssh-copy-id`, or `>>` after checking the existing lines. Keep a copy of the old file first.
+- Read-only production checks: use a named read-only role or account, count rows and read timestamps only, and never select personal columns. Creating roles, changing permissions, or using sudo needs explicit approval first. See references/remote-host-access.md for the procedure.
 
 ## Testing
 

@@ -59,9 +59,25 @@ For merging stacks into main, and for GitHub 403 errors, see references/stacked-
 - A chained shell command stops at the first failure only if each step is joined with `&&`. A `;`-joined step after a failed `cd` or `checkout` runs in the wrong directory, so a later `npm install` or merge can act on the wrong branch. Use an absolute path or the tool's `workdir` parameter for each step that changes files.
 - Do not commit or switch branches in a checkout that holds someone else's uncommitted generated files. Clear them first, or use a fresh worktree.
 
+## Product naming and identifiers
+
+- App-facing names, bundle IDs, Android packages, URL schemes and stored-key names carry the product name only. Internal workstream or project names do not appear in them. Grep the mobile and web trees for the internal name before each commit.
+- A URL scheme is set in two places: `app.json` and any constant in the code. Change both together, then grep for the old value.
+- A bundle ID is permanent once published. Get the owner's explicit approval for the final ID before any store registration, and note that the ID is pending until then.
+- Renaming an app does not rename backend contracts (API paths, realm names, environment variable names). Leave those unchanged, and list them as a separate approved change when they must move.
+- A new redirect scheme needs a matching redirect URI in the identity provider's client config. Flag it as a backend change.
+
+## Mobile test runs
+
+- Jest's default 5-second timeout can fail a heavy screen test under load. Rerun once before treating it as a regression, and raise the limit for that single test only if the rerun fails too.
+- Read the exit code of the real test command, not the exit code of a pipeline. A pipeline reports the status of its last filter, so run the test command alone and capture its output to a file.
+- Do not clean up background processes with `pkill -f <pattern>` when the pattern appears in your own shell command. It kills the shell running the cleanup.
+
 ## Autonomy
 
 - Proceed with ordinary development without waiting for approval: code, tests, branches, draft PRs, docs, local infrastructure on the existing host.
+- Do not idle while waiting for a non-blocking choice. Do the next item that needs no approval, and ask only the one question that blocks it.
+- A background-job notice reports that a job finished, not what it found. Open the result file and check its timestamp before reporting its outcome, and do not repeat an old result as new.
 - Stop and ask only for: purchases or new paid services, changes to production servers or live DNS, destructive operations on data, and account or credential changes (adding scopes, creating accounts, rotating secrets). Report the exact action needed and continue with everything else.
 
 ## Output format

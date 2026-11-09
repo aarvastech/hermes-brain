@@ -45,6 +45,8 @@ Use for a PostgreSQL database in a Docker container when backups must be schedul
 - **Apply migrations only to the approved database.** Verify on a scratch copy first, using the same migration config.
 - **Docker private networks have no internet.** A `pip install` from a container on the private network fails. Install dependencies on the default network into a named volume, then mount that volume into the private-network run.
 - **Clean up scratch databases and temporary volumes** after each check. List `pg_database` entries matching the scratch prefix to confirm none remain.
+- **Re-copy the backup script to the cron path after every repo change.** A stale host copy runs old logic while the repo shows the fix; compare checksums of the two copies before reporting that the schedule has the fix.
+- **Restore-test a dump of the same schema version.** Migrations applied after a dump make the restored schema differ from the live one, so compare the migration version table as well as the row counts.
 
 ## References
 

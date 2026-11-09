@@ -27,6 +27,9 @@ Use this when deciding what to build, in what order, for whom, and how we will k
 - Each user role gets one journey that works end to end before any role gets a second screen.
 - Show the cut clearly to the founder with what is in, what is roadmap, and why.
 - Clinical and regulatory decisions have a named approver before real use.
+- Match the prospect's operating model before designing screens. A home-care operator sells service areas and client households; a facility operator sells units and wings. Ask the discovery question first, then build the model they recognise.
+- One app per organisation, multi-user by role. People outside the organisation (families, elders) get a separate consumer app. An individual practitioner is an organisation of one.
+- Demo labelling is the owner's decision. The owner may drop repeated synthetic labels for an internal demo. The rule that a simulated action is never shown as completed stays in force regardless.
 
 ## Decision rights
 

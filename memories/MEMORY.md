@@ -11,3 +11,5 @@ gh token needs the workflow scope to push .github/workflows files. Reading CI re
 Summit tests: use /tmp/summit-venv/bin/python. Real Redis via scripts/run_summit_redis_tests.sh. PostgreSQL via a throwaway container: wait until psql select 1 succeeds 3 times in a row (pg_isready is too early).
 §
 Summit backups: cron runs ~/summit-ops/summit_backup.sh (copy of repo scripts/summit_backup.sh; re-copy after edits) 21:00 UTC; status 22:00 UTC. Dumps in ~/summit-backups. Stack DB had no schema as of 2026-11-07.
+§
+gh pr edit fails on this host with a Projects (classic) deprecation error. Update PR bodies with: gh api -X PATCH repos/aarvastech/aarvas/pulls/N -F body=@file.

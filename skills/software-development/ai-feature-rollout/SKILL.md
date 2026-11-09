@@ -45,6 +45,13 @@ Use for any feature that calls a hosted model API: summaries, drafts, rephrasing
 - **Mocked tests of the client are not evidence the real path works.** A test that mocks the model's message method can pass while the real client has no such method. Include one unmocked construction test of the adapter with no network.
 - **Pricing changes.** Prices in code go stale. Store the read date and re-verify before any cost statement.
 - **Measured usage beats estimates.** Report the estimate as an estimate until a live run has produced token counts.
+- **Set the provider's spending cap at or above the application ceiling, never below.** A provider cap that trips first makes the failure look like an API error, and the application guard never gets to refuse cleanly. Match the application ceiling to the provider cap or lower it.
+- **Install the project's dev extras before running existing suites.** A bare virtualenv lacks the SDK and settings packages, so test modules fail at collection with import errors that look like code failures. Run `pip install -e ".[dev]"` first, then rerun.
+- **Benchmark scripts print counts and cost only,** never generated text, prompts or key values, so their output can be shared safely.
+- **Verify a key by length, never by printing it.** Check presence with a character count of the value after the `=`, and keep the file mode at 600. Do not accept a key pasted into chat; ask the owner to place it in the secrets file.
+- **Keep a live check to one purpose and one call per feature.** Turn the flags on only inside that process, run the opt-in test or a fixed synthetic set, then confirm the server config still has the flags off.
+- **Report validator match rate separately from fallback rate.** A validator that falls back often may be too strict, or the fixtures may expect different outcomes. Compare each case's expected outcome with the actual result before calling either correct.
+- **A fake-provider evaluation measures the harness, not model quality.** Label its scores as harness checks until a live run has produced real outputs.
 - **Do not describe a feature as clinically reviewed** until a documented review record exists for that version.
 
 ## Output format

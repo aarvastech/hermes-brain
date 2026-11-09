@@ -60,6 +60,7 @@ and tell the user to rotate it, even a partially-masked one.
   even under time pressure, because plaintext credentials end up logged/cached
   outside the vault's access controls.
 - **Success after submit is the URL reaching the app's origin, not the form disappearing.** SSO pages can clear the form while still on the auth origin. Check `page_info()` for the app URL before reporting a login.
+- **Verify each fill by field length, never by value.** Before submitting, read each input's `value.length` with js; a vault fill's `filled_fields` count does not prove the password field received the secret. Never print the values themselves.
 - **`browser_vault(list)` returning empty does not mean "not saved yet"** — it can
   also mean the user saved it to a different Hermes profile or a different backend
   (e.g., Desktop app's local vault vs. the backend this session's browser tool uses).
