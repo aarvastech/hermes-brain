@@ -11,6 +11,7 @@ Use this when a feature spans the database, the API, the web or mobile client, a
 
 ## Order of work
 
+0. **Trace the production read path first.** Before building a screen, confirm which store and API the screen will read in production, and confirm that store already receives the real events. A screen built on generated seed data cannot be connected to real events later without a rewrite. If the event pipeline already exists, reuse it and build the screen on top.
 1. **Data model first.** Write the schema change as a versioned migration with an upgrade test on the previous schema and on a fresh database.
 2. **Core logic next, with no HTTP.** Rules, state changes and access checks live in the service layer and are tested directly.
 3. **API route third.** Thin: parse input, call the service, map errors to stable codes, never return stack traces. Declare the roles for each route. Default deny.
@@ -58,6 +59,8 @@ For merging stacks into main, and for GitHub 403 errors, see references/stacked-
 - Stacked branches: confirm the parent's latest head is an ancestor of the child before trusting the child's tests, and rerun the tests after every rebase.
 - A chained shell command stops at the first failure only if each step is joined with `&&`. A `;`-joined step after a failed `cd` or `checkout` runs in the wrong directory, so a later `npm install` or merge can act on the wrong branch. Use an absolute path or the tool's `workdir` parameter for each step that changes files.
 - Do not commit or switch branches in a checkout that holds someone else's uncommitted generated files. Clear them first, or use a fresh worktree.
+- Web and mobile clients of one product must call the same API prefix and contracts. Check route parity before building phone screens. A phone app that calls an older API shows different data from the web, which is hard to fix after both ship.
+- When a feature has a demo mode, keep the demo as a data source behind the same contract, not a separate code path. Switching from demo to live then changes configuration only.
 
 ## Product naming and identifiers
 

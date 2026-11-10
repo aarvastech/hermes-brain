@@ -2211,3 +2211,5 @@ onboarding:
   seen:
     profile_build_offered: true
     busy_input_prompt: true
+command_allowlist:
+  - script execution via -e/-c flag
