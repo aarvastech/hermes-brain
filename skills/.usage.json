@@ -101,15 +101,15 @@
     "created_by": "learn",
     "first_seen_at": null,
     "last_patched_at": "2026-11-10T14:11:05.483764+00:00",
-    "last_reused_patch_generation": 11,
-    "last_used_at": "2026-11-10T14:10:36.122199+00:00",
-    "last_viewed_at": "2026-11-10T14:10:36.101848+00:00",
+    "last_reused_patch_generation": 13,
+    "last_used_at": "2026-11-11T15:29:25.161795+00:00",
+    "last_viewed_at": "2026-11-11T15:29:25.135118+00:00",
     "patch_count": 13,
     "patch_generation": 13,
     "pinned": false,
     "state": "active",
-    "use_count": 15,
-    "view_count": 15
+    "use_count": 16,
+    "view_count": 16
   },
   "github": {
     "archived_at": null,
@@ -165,15 +165,15 @@
     "created_by": "agent",
     "first_seen_at": null,
     "last_patched_at": "2026-11-06T18:14:49.246102+00:00",
-    "last_reused_patch_generation": 21,
-    "last_used_at": "2026-11-06T18:14:11.820101+00:00",
-    "last_viewed_at": "2026-11-06T18:14:11.781363+00:00",
+    "last_reused_patch_generation": 23,
+    "last_used_at": "2026-11-11T15:29:25.190573+00:00",
+    "last_viewed_at": "2026-11-11T15:29:25.186480+00:00",
     "patch_count": 23,
     "patch_generation": 23,
     "pinned": false,
     "state": "active",
-    "use_count": 18,
-    "view_count": 18
+    "use_count": 19,
+    "view_count": 19
   },
   "mobile-store-listing-prep": {
     "archived_at": null,
@@ -229,15 +229,15 @@
     "created_by": "agent",
     "first_seen_at": null,
     "last_patched_at": "2026-11-10T14:11:05.739513+00:00",
-    "last_reused_patch_generation": 6,
-    "last_used_at": "2026-11-10T14:10:47.648947+00:00",
-    "last_viewed_at": "2026-11-10T14:10:47.641980+00:00",
+    "last_reused_patch_generation": 8,
+    "last_used_at": "2026-11-11T15:29:25.178793+00:00",
+    "last_viewed_at": "2026-11-11T15:29:25.169724+00:00",
     "patch_count": 8,
     "patch_generation": 8,
     "pinned": false,
     "state": "active",
-    "use_count": 4,
-    "view_count": 4
+    "use_count": 5,
+    "view_count": 5
   },
   "qa-self-validation": {
     "archived_at": null,
