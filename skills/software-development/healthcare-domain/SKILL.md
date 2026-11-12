@@ -27,6 +27,8 @@ Use this for patient records, clinical workflows, emergency response, lab orders
 - AI may draft notes, summarise history, rephrase approved wording and suggest checks. It must not diagnose, prescribe, change a dose or schedule, or set or change an emergency severity. A clinician approves every draft before it enters the record.
 - AI rephrasing of an approved template must be validated mechanically: every number, time, dose and medication name from the template must appear unchanged in the output, and no sentence may add a medical instruction. On failure, return the original template and record the fallback.
 - Every AI output is labelled AI-generated and stored with its model, version, prompt-template version and time. Keep the raw data it summarises visible beside it.
+- Attribution in a shared home: report a dose or reading for a person only when the platform has a person-level link. A sole resident is the only automatic link. A schedule-based or position-based assignment is "prescribed to", never "taken by". A shared device (for example one pulse oximeter used by two residents) stays unassigned until the person is recorded.
+- A clinician's review decision records the reviewer, time and decision, and changes review status only. It never changes the stored severity, and it never turns a placeholder threshold into a validated one.
 - Show time and source for every clinical value. Stale data must look stale.
 - Missing data is not normal data. Show "not recorded" rather than zero.
 - Alarms need an acknowledgement, an owner, and escalation when unacknowledged.

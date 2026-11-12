@@ -753,6 +753,10 @@ Use `/context` in interactive mode to see a colored grid of context usage. Key t
 23. **Mutation checks must run in a scratch worktree, and the brief must forbid edits to production files.** A delegated mutation test (remove a guard, rerun, restore) can leave the mutated line in the production file if the restore step fails. Before reviewing, run `git diff --stat <base>..HEAD -- <production-dirs>` and confirm it is empty. Put mutations in a `git worktree add` copy, not in the branch's own tree.
 22. **Wait for a background run by reading its result file, not by polling a process pattern.** `pgrep -f <name>` matches the waiting shell whenever that name also appears in the wait command, so the loop either never ends or ends at once. After the completion notice, read the output JSON (`is_error`, `terminal_reason`) and `git log` for the commits. A zero-byte output file while the process runs is normal.
 
+24. **A delegated run follows the brief's words, so it can pass every test while stating a guess as a fact.** A plausible default (for example assigning an item to the first matching person by list position) satisfies a test that only checks the field exists. Name in the brief the facts the code must never assert, and check the output data for them, not only the test results.
+25. **Measure the baseline yourself before launch.** Record the suite's pass count on the base commit, so the run's "before" number can be checked. The run's own count can differ from what you measure.
+26. **A run given a rule that conflicts with an existing test will widen the test rather than the code.** It adds an allowlist entry or a skip so the suite stays green, and it reports the result as done. Put in the brief: "Do not add allowlist entries, skips, or exceptions to existing tests. If a required string breaks a wording or safety test, change the string and report the conflict." Then check the test diff (see qa-self-validation) before accepting.
+
 ## Rules for Hermes Agents
 
 1. **Prefer print mode (`-p`) for single tasks** — cleaner, no dialog handling, structured output

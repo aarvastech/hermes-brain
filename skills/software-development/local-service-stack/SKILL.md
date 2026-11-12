@@ -69,7 +69,7 @@ it does not need the hosted-deployment approval. See `references/phone-access-ov
    `pkill -f '[u]vicorn <module>'`: a plain pattern also matches the shell running the `pkill`,
    which ends that session and the command with it. Do not use `nohup`, `&` or `setsid` inside the
    background call; the terminal tool rejects them. Servers never exit, so no completion notice is
-   wanted. Probe readiness with `curl` in a separate call.
+   wanted. Probe readiness with `curl` in a separate call. To restart on new code: find the listening pid with `ss -ltnp | grep :<port>`, stop it, confirm `ss -ltn` shows the port free, start the new process, and check its log for `address already in use` before probing. Probe only after the log shows startup complete.
 
 7. **Smoke-test with a table of expected status codes.** Use `templates/api-smoke-test.sh`.
    Include both the happy path and the default-deny cases: unauthenticated 401, another
@@ -110,6 +110,7 @@ it does not need the hosted-deployment approval. See `references/phone-access-ov
   India, and a development build that calls an overseas service is for testing only, never for real data.
 - **Staging a compose stack that has a public reverse proxy.** A bare `docker compose up -d` also starts the proxy, which publishes 80 and 443 and exposes the stack before DNS and firewall approval. Name the internal services explicitly (`up -d <db> <cache> <auth>`), then check the published-port list in `docker ps` before going further.
 - **A config file is not live until the running service loads it.** Some services import data files only on first start. Keycloak's `--import-realm` skips an edited realm file when the realm already exists in its database volume, so a restart looks applied but is not. Verify the running service through its API after any change. Checks are in `references/keycloak-realm-checks.md`.
+- **A `Not Found` from a route you just added means the running server predates the commit.** Restart it on the new code (step 6). Do not edit the route or the test to get past the error.
 - **Smoke-test data is local only.** Use synthetic identifiers such as `+1555...` numbers and
   placeholder names. Never use real customer or patient data here, even for a quick check.
 

@@ -1,7 +1,11 @@
-Dinesh is founder and legal signing authority for AARVAS Technologies (India, IST). He personally handles account enrollment, payments, D-U-N-S and Apple/Google developer accounts; Hermes must never enroll, pay or hold his credentials. Wants Claude Code (claude.ai login, no API keys) for all coding, rule-based AI and simulated payments for the summit, and no paid APIs without approval. Wants Hermes to keep building within approved scope, report briefly, and ask before purchases, production changes or destructive operations. Product decisions (Patient ID format, consent purposes, bundle ID) stay open for his sign-off and go in DECISIONS_LOG.md with a named owner.
-§
-Dinesh wants Hermes to keep building on agreed scope without waiting for each step. Ask only for mandatory approvals: purchases, production changes, credentials and clinical sign-off. He wants independent reruns and evidence, not agent claims. The summit demo runs the production code, not a separate demo product.
-§
 Dinesh does not accept probe-table, empty-database or synthetic-only checks as completion of backup/restore work; restore evidence must cover the full schema and check row counts and constraints.
 §
 AI work: synthetic data only; USD 50/month model cap, no auto-increase; approval before paid services. Dinesh alone creates and funds vendor accounts; Hermes never adds payment methods.
+§
+Dinesh prefers action: build and report; ask only for production changes, purchases, credentials, or >30-min plans. One app per organisation; separate family app. Demo screens should not carry demo labels.
+§
+Dinesh is often away from the server: give him work that doesn't need him, and make any password or approval step a single command he runs himself.
+§
+Expects Hermes to keep working through steps without pausing, to check its own screens and routes before asking him to test, and wants an appealing AARVAS-branded UI.
+§
+Dinesh expects every UI or feature to pass Development, QA, UI/UX, Product and Domain review before it is sent to him for a check. He has said he does not want unchecked work sent to him.

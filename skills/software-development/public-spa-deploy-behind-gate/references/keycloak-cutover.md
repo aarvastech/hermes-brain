@@ -5,7 +5,7 @@ Use when the public demo gate must give way to real identity. Each step has a ch
 ## 1. Realm and clients (in the Keycloak container, env creds, no printing)
 - Run kcadm inside the container with `$KEYCLOAK_ADMIN` and `$KEYCLOAK_ADMIN_PASSWORD` from the container env. Do not echo them.
 - Create a new realm for the app. Do not reuse a realm that another system uses. Set sign-up off, reset-password off, brute-force protection on, `sslRequired=external`.
-- Realm roles for each care role. Clients: one public web client (PKCE, redirect URI for the site only) and one mobile client (custom scheme and `exp://` redirect only).
+- Realm roles for each care role. Use the exact role names the client app's role map reads (grep the client for its role map first). A name mismatch makes the app show no access even though sign-in works. Clients: one public web client (PKCE, redirect URI for the site only) and one mobile client (custom scheme and `exp://` redirect only).
 - Check: `kcadm get realms` lists the new realm, and the OIDC discovery URL answers.
 
 ## 2. Public issuer address
@@ -22,7 +22,7 @@ Use when the public demo gate must give way to real identity. Each step has a ch
 - Check: discovery over HTTPS returns 200 with the expected `issuer`; `/admin/` returns 404 from outside.
 
 ## 5. Staff accounts without passwords
-- Create one user per staff member with `username` equal to the directory staff ID and a `staff_id` attribute. Assign the realm role. Give each user an email, because the user profile requires one to finish setup. Use a clearly fake domain for test accounts and say so.
+- Create one user per staff member. The username can be a readable login name if the API maps it to the staff ID through the organisation profile (a `sign_in_names` table). Map every login name in the profile, and test the mapping in the production sign-in path (the dev-bypass tests skip it). Assign the realm role. Give each user an email, because the user profile requires one to finish setup. Use a clearly fake domain for test accounts and say so.
 - Set passwords through a script that reads input with hidden prompts and passes the value to kcadm with `-e` (never on a command line or in the log). Tell the owner the script path and let them run it.
 - Each `docker exec` call starts a fresh kcadm session. Run `kcadm config credentials` at the start of every exec, or the later commands fail with an auth error that looks like a bad admin password.
 - Check: the account can sign in once a password is set. Do not claim this until a real sign-in has succeeded.
@@ -36,3 +36,5 @@ Use when the public demo gate must give way to real identity. Each step has a ch
 ## Pitfalls
 - Do not switch the live public site before the staff passwords exist. The role picker goes away and every visitor is locked out.
 - Audience checks are a gap until the API verifies the audience claim. Note it in the report instead of calling sign-in complete.
+- The app may send its token in a header other than `Authorization` once the gate is gone. Accept the app's header in production, and make sure the proxy passes it through unchanged.
+- Deleting a user needs the id, not the username: look the id up with `get users -q username=...` first. A delete by username silently does nothing.

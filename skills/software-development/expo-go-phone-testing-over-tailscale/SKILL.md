@@ -32,6 +32,14 @@ A phone must load an Expo dev-server bundle from this host, and the host must no
    the host is still building.
 6. On the phone, open `exp://<tailscale-ip>:8081` from Notes. Expo Go's own server list does not discover tailnet addresses.
 
+## Tunnel mode (public tunnel, not Tailscale)
+- Use `expo start --tunnel --port <port>` only when the phone is off the tailnet. Start it with `background=true` and notify on completion, not with `nohup` inside a foreground call. A process started as a child of a finished shell session dies with that session.
+- A tunnel address changes on every start. Read it from the log, check `curl` on its `index.bundle?platform=android&dev=true&hot=false` returns 200, and quote that exact address to the owner.
+- A 502 "No server is connected" on the phone means the tunnel is up but the dev server behind it is gone. Restart the server, then re-check the bundle.
+- Restart by stopping the process group and confirming the port is free (`ss -ltnp`), not by killing only the parent.
+- Re-check the bundle URL immediately before sending an address to the owner. An earlier 200 does not cover a tunnel that dropped since.
+- Full recovery steps are in the mobile-ui-review skill (its tunnel reference). Load it with skill_view(name='mobile-ui-review').
+
 ## SDK upgrades
 If the SDK must change to match the phone, follow `references/sdk-major-upgrade.md`. Restart Metro after the upgrade; the old process keeps serving the previous SDK.
 

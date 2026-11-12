@@ -61,6 +61,16 @@ For merging stacks into main, and for GitHub 403 errors, see references/stacked-
 - Do not commit or switch branches in a checkout that holds someone else's uncommitted generated files. Clear them first, or use a fresh worktree.
 - Web and mobile clients of one product must call the same API prefix and contracts. Check route parity before building phone screens. A phone app that calls an older API shows different data from the web, which is hard to fix after both ship.
 - When a feature has a demo mode, keep the demo as a data source behind the same contract, not a separate code path. Switching from demo to live then changes configuration only.
+- Before writing a client adapter, call each endpoint it will use against a local run and read the real keys. A client written against an assumed shape fails silently (empty lists, undefined fields), and the tests written from the same assumption pass.
+- A client screen whose backend route does not exist must not ship as live. Either build the route first, or hide the screen and skip its tests with a TODO that names the missing route. Never delete the tests.
+- A route for an action the backend cannot perform yet returns 422 with a clear message. Do not accept the request and fake the result.
+- Role-based visibility is enforced on the server. The client's tab table only hides what the server already refuses. Test the server refusal for each role that must not see an action.
+- A screen that does not draw a field still receives it. Scope each role's response as an allow-list of fields on the server, and check the raw JSON for every role with curl: no forbidden key may appear, not only in what the screen shows.
+- Free-text notes default to private. Share a note with a family role only when a per-item flag is set. Vitals and clinical fields reaching a family role are a disclosure decision: confirm the consent scope before exposing them.
+- An empty state must say why it is empty. "No open alerts" or "None scheduled" shown while the source is not connected reads as a clean status. Show "not on the platform yet" when the data source is missing, and "none" only when the source answered with no rows. A 404 from an old route must never render as an empty list.
+- Fields a safety gate checks (for example a data-mode value that an AI gateway tests) are configuration, not display text. Renaming them to remove a word weakens the gate. Change display strings only.
+- A production-grade app shows no demo, sample or synthetic labels in responses or UI. Scan the API output and the built bundle for those words, and also check internal names that leak into data fields.
+- Client role names must match the identity provider's realm roles exactly. Grep the client's role map and the realm before creating roles.
 
 ## Product naming and identifiers
 
@@ -79,7 +89,7 @@ For merging stacks into main, and for GitHub 403 errors, see references/stacked-
 ## Autonomy
 
 - Proceed with ordinary development without waiting for approval: code, tests, branches, draft PRs, docs, local infrastructure on the existing host.
-- Do not idle while waiting for a non-blocking choice. Do the next item that needs no approval, and ask only the one question that blocks it.
+- Between reports, keep executing the queued items that need no approval. A message that only states status, with no tool call behind it, is idle. Ask only the one question that blocks the next item, and do that item while the question is open.
 - A background-job notice reports that a job finished, not what it found. Open the result file and check its timestamp before reporting its outcome, and do not repeat an old result as new.
 - Stop and ask only for: purchases or new paid services, changes to production servers or live DNS, destructive operations on data, and account or credential changes (adding scopes, creating accounts, rotating secrets). Report the exact action needed and continue with everything else.
 

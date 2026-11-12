@@ -2,14 +2,12 @@ Role: acting as full-stack dev lead for AARVAS Technologies. Standing workflow r
 §
 AARVAS summit demo (target 15 Nov 2026): isolated stack planned on Contabo host (France, IP 169.58.96.227; Tailscale for admin). demo.aarvastech.com still points to another cloud (89.167.95.6); Dinesh will switch the DNS record himself. Never change DNS, firewall or live-demo services without his approval. Summit docs: branch hermes/summit-assessment, PR #11, docs/summit/.
 §
-GitHub CLI token needs the `workflow` scope to push .github/workflows changes, and actions:read plus checks:read to view CI runs. Without them pushes and run lists fail with 403.
-§
 Stacked PRs: retarget each PR's base to main before merging, then confirm the merge commit is on origin/main. A hidden gh pr edit error once merged four PRs into stacked branches.
 §
-gh token needs the workflow scope to push .github/workflows files. Reading CI results needs actions:read and checks:read, which are not granted by default.
-§
-Summit tests: use /tmp/summit-venv/bin/python. Real Redis via scripts/run_summit_redis_tests.sh. PostgreSQL via a throwaway container: wait until psql select 1 succeeds 3 times in a row (pg_isready is too early).
-§
-Summit backups: cron runs ~/summit-ops/summit_backup.sh (copy of repo scripts/summit_backup.sh; re-copy after edits) 21:00 UTC; status 22:00 UTC. Dumps in ~/summit-backups. Stack DB had no schema as of 2026-11-07.
+Summit tests: /tmp/summit-venv/bin/python; real Redis via scripts/run_summit_redis_tests.sh; PostgreSQL via throwaway container, wait for psql select 1 three times.
 §
 gh pr edit fails on this host with a Projects (classic) deprecation error. Update PR bodies with: gh api -X PATCH repos/aarvastech/aarvas/pulls/N -F body=@file.
+§
+AARVAS Care repos: ~/work/provider-platform (hermes/provider-platform, API and web) and ~/work/aarvas-mobile (hermes/aarvas-mobile, app). Public API: ~/network-site/run-api.sh behind Caddy.
+§
+Expo tunnel dies when its shell session ends; restart it and confirm the tunnel URL returns 200 before reporting. Web build needs VITE_KEYCLOAK_URL=https://auth.network.aarvastech.com, VITE_KEYCLOAK_REALM=aarvas-care, VITE_KEYCLOAK_CLIENT_ID=aarvas-care-web; without them it falls back to localhost:8080 realm aarvas. Summit backups: cron 21:00 UTC, status 22:00 UTC, dumps in ~/summit-backups (7-day retention, ALERT on failure).
