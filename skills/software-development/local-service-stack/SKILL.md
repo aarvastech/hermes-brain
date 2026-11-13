@@ -110,7 +110,9 @@ it does not need the hosted-deployment approval. See `references/phone-access-ov
   India, and a development build that calls an overseas service is for testing only, never for real data.
 - **Staging a compose stack that has a public reverse proxy.** A bare `docker compose up -d` also starts the proxy, which publishes 80 and 443 and exposes the stack before DNS and firewall approval. Name the internal services explicitly (`up -d <db> <cache> <auth>`), then check the published-port list in `docker ps` before going further.
 - **A config file is not live until the running service loads it.** Some services import data files only on first start. Keycloak's `--import-realm` skips an edited realm file when the realm already exists in its database volume, so a restart looks applied but is not. Verify the running service through its API after any change. Checks are in `references/keycloak-realm-checks.md`.
+- **A dev tunnel or server started in a foreground call dies when that call's shell exits, and a tunnel address that worked earlier can return 502 later.** Start it detached, read the tunnel URL from its log, and confirm the public address returns 200 before sharing it.
 - **A `Not Found` from a route you just added means the running server predates the commit.** Restart it on the new code (step 6). Do not edit the route or the test to get past the error.
+- **Record a rollback point before deploying a backend change to a live host.** Note the branch, the commit and the process start time (`ps -o lstart= -p <pid>`). A running service reads the working tree at its next start, so checking out another branch in that folder changes what the next restart runs. To roll back, check out the recorded commit and restart the service.
 - **Smoke-test data is local only.** Use synthetic identifiers such as `+1555...` numbers and
   placeholder names. Never use real customer or patient data here, even for a quick check.
 

@@ -20,6 +20,7 @@ Use this for a single-host deploy: a Vite/React static build, an API on localhos
    - Check the other sub-paths the app uses (for example a household detail page and an alerts page), not only the entry route. A route that works on `/` can still fail on deep links.
 8. Grep the served bundle through the gate for banned wording and for `localhost`. Report the matches.
 9. Rotate the gate password after any test that printed it, then confirm the old one gives 401.
+10. Deploy an API change when the API runs from a git working tree. Record the live commit first (`git rev-parse --short HEAD` in that folder) as the rollback point. Check out the branch, stop the listening PID found with `ss -ltnp | grep :<api-port>`, and restart with the run script. Then check the public `/api/openapi.json` for the new paths, and confirm a protected route returns 401 without a token (a 404 means the new code is not running). Rollback: check out the recorded commit and restart the same way.
 
 ## Pitfalls
 
@@ -36,8 +37,9 @@ Use this for a single-host deploy: a Vite/React static build, an API on localhos
 - Gate the deploy on the build's exit code in the same command, and read the build log for `error` before copying. A build that failed midway can still leave a partial `dist/` folder, which then goes live.
 - Restart the API, then read its log for a traceback before any browser test. A new code path that raises `NameError` (for example a missing import on the sign-in path) shows in the app as "Request failed (500)" after a successful sign-in, and the dev-bypass tests may not exercise that path.
 - Stop the old API by PID, found with `ss -tlnp | grep :<port>`. `pkill -f` with the same string kills your own shell.
-- A build output directory tracked in git changes on every build. Treat it as a scratch copy: build into a fresh folder, verify it, and deploy from there. Do not commit the tracked output, or the next deploy diff hides real changes.
+- A build output directory tracked in git changes on every build. Treat it as a scratch copy: build into a fresh folder (`npx vite build --outDir <scratch> --emptyOutDir`), verify it, and deploy from there. Do not commit the tracked output, or the next deploy diff hides real changes.
 - Local dev env files (`.env.local`) are read by the build. Pass the public `VITE_*` values on the build command line so a localhost value in a local file cannot leak into the public bundle, then grep the bundle for `localhost`.
+- A live API that runs from a working tree serves the branch checked out at its last restart, and it also serves any uncommitted edits in that folder. Before a deploy, commit or deliberately stash the local edits, and confirm which ones will be live. Checking out a branch in that folder changes production on the next restart, so do it only with the rollback commit recorded.
 
 ## Decision
 

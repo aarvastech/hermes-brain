@@ -15,7 +15,7 @@ Use this when a pilot needs devices (hubs, sensors, cameras, wearables). The age
 
 ## Procedure
 
-1. Write the device list first: device type, count per home, protocol (Zigbee, Bluetooth, RTSP over PoE or Wi-Fi), and what each feeds in the platform. Confirm the hub's role before shopping, since a bridge and a coordinator are different products.
+1. Write the device list first: device type, count per home, protocol (Zigbee, Bluetooth, RTSP over PoE or Wi-Fi), and what each feeds in the platform. Take the device list from the platform's hardware spec in its repo (for example docs/hub-hardware.md) and the product document, not from memory, and cite the section used. Confirm the hub's role before shopping, since a bridge and a coordinator are different products.
 2. Search for candidates with `web_search`, one query per device type, adding the city or the "India" term.
 3. Read each candidate page with `web_extract`. Record the price the page shows, the page URL, and the date checked. A price that does not come from the page is not a price. Pages that return a 404 or no price are listed as "price not verified".
 4. Check the certification the device needs before it touches a person. Medical readings (pulse oximeter, heart rate, fall detection) need a registration check (CDSCO for India) on the manufacturer's own page, not only a shop listing. Mark "CE marked" as a claim from the seller, not a registration.

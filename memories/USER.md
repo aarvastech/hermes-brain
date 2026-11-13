@@ -9,3 +9,5 @@ Dinesh is often away from the server: give him work that doesn't need him, and m
 Expects Hermes to keep working through steps without pausing, to check its own screens and routes before asking him to test, and wants an appealing AARVAS-branded UI.
 §
 Dinesh expects every UI or feature to pass Development, QA, UI/UX, Product and Domain review before it is sent to him for a check. He has said he does not want unchecked work sent to him.
+§
+Dinesh wants each UI or feature checked in order (Development, QA, UI/UX, Product, Domain) before he is asked to test. He rejects handoffs with only code-level test results, and wants the assistant to check screens itself first.

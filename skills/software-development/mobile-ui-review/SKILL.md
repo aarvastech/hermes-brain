@@ -20,13 +20,13 @@ Run these stages in order, in one run, without pausing between them. When the ow
 
 ## Route check (before any walkthrough)
 
-1. For every endpoint the app calls, confirm the platform serves it. Run `python3 scripts/check_api_routes.py <endpoints-file> <openapi-json-or-url> --prefix /app` from this skill's folder. Each MISSING path is a screen that will show an error on the phone. Fix or hide it before the walkthrough.
+1. For every endpoint the app calls, confirm the platform serves it. Run `python3 scripts/check_api_routes.py <endpoints-file> <openapi-json-or-url> --prefix /app` from this skill's folder. Each MISSING path is a screen that will show an error on the phone. Fix or hide it before the walkthrough. Run it against the host the phone build calls (the public API named in the build's env file), not only the local dev server: a route that exists locally but not on the deployed API shows as a load error on the phone.
 2. Call each read endpoint as each role and record the status codes. A 200 for a role that should be refused is a finding, even if the screen hides the data.
 
 ## Procedure
 
 1. Render each role's screens, not one. For each role (family, caretaker, nurse, doctor, manager), open every tab and drill-down on device or simulator. Screenshot each. If no screenshot tool exists on the host, say so, and check data and layout with a render test instead.
-2. Write a render test for each screen that reads platform data. Use a real captured response saved as a fixture (not a hand-written object), and assert that the labels a user would read are on screen. Hand-written fixtures hide shape mismatches.
+2. Write a render test for each screen that reads platform data. Use a real captured response saved as a fixture (not a hand-written object), and assert that the labels a user would read are on screen. Hand-written fixtures hide shape mismatches. Capture one fixture per state the screen can render (for example an unattributed item, a resolved item, an empty list); a fixture from a shared server with one record leaves the other branches untested.
 3. Judge each screenshot against the checklist. Write findings as a numbered list with the screen name.
 4. Fix, rebuild, and re-capture the same screens. Do not report done from code alone.
 5. Report the screens checked, the findings, and what was not checked (Android vs iOS, dark mode).
@@ -45,6 +45,7 @@ Run these stages in order, in one run, without pausing between them. When the ow
 - Do not ship plain white stacked lists. Use summary tiles and grids: each item is a tile with a colour, a name and a short meta line. A row of full-width buttons reads as an admin list and is rejected.
 - Use the brand palette for tiles and headers (royal blue primary, navy titles, cyan accent). Where several groups sit on one screen (for example service areas), give each group its own colour so they read as separate regions. Keep the colour assignment stable for each named group.
 - Dashboard first: a greeting or one-line status, a row of summary tiles, then grouped cards. Show counts only from a real source; say "not connected yet" for anything without one.
+- Clinical role home screens (doctor, nurse) follow the same rule. A sortable table of households is the admin list the owner rejects. Use summary tiles, cards for residents who need review, and cards with buttons for the review queue. A table is acceptable only as a secondary detail that opens on tap.
 - Before reporting a look as done, state the colours and layout in words and ask the owner to confirm on the phone. Do not describe a look as done from code alone.
 
 ## Checklist
@@ -76,3 +77,6 @@ Run these stages in order, in one run, without pausing between them. When the ow
 - In a render test, `getByText` throws when the same label appears more than once (for example a line repeated per resident). Use `getAllByText` with `length > 0`, or scope the query with `within`.
 - Show a `null` value field as "not recorded". Never show it as zero, and never fill it with a default name.
 - A schedule-based guess is not a fact. Show a dose as taken by a person only when the platform confirms the person (for example `attribution_source` is `sole_client`). Otherwise show "who took it not recorded" and the prescribed person on a separate line. The same rule covers readings from a shared device: say "not assigned to a resident".
+- A "Could not load…" error on a screen after a successful sign-in means a missing route or an out-of-date deployed API. It is not a sign-in fault. Check the route on the host the phone calls before changing the screen code.
+- Each role's home screen reads only that role's endpoints. A screen copied from the manager's home can call a route the role is refused, and the owner sees it as a load error on the phone.
+- A backend route that works on the local dev server is not live until the host the phone calls has been restarted on that code. Local tests cannot see this gap. After any backend change, check the new route on the public host with a token before asking the owner to open the app.

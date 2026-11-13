@@ -22,13 +22,16 @@ Use this for patient records, clinical workflows, emergency response, lab orders
 ## Safety rules for software
 
 - A notification is not an action. Never imply an ambulance, doctor or pharmacy has been dispatched or has accepted unless a real system confirmed it.
-- Clinical thresholds (SpO2, heart rate, blood pressure, fall timing) are configuration. They need a named clinician's sign-off before real use. Until then, flag every event as demo-only.
+- Clinical thresholds (SpO2, heart rate, blood pressure, fall timing) are configuration. They need a named clinician's sign-off before real use. Until then, label every threshold "not yet clinically validated" in the stored record and in every output. Do not use the word demo in app or UI text.
 - Physiological thresholds need a registered physician (MBBS), ideally with geriatrics, emergency or critical-care experience. A dentist or other non-physician qualification does not qualify. Record the approver in the decision log with the sign-off date. For the role's duties, qualifications, independence rules and the approval record fields, see references/clinical-approver-role.md.
 - AI may draft notes, summarise history, rephrase approved wording and suggest checks. It must not diagnose, prescribe, change a dose or schedule, or set or change an emergency severity. A clinician approves every draft before it enters the record.
 - AI rephrasing of an approved template must be validated mechanically: every number, time, dose and medication name from the template must appear unchanged in the output, and no sentence may add a medical instruction. On failure, return the original template and record the fallback.
 - Every AI output is labelled AI-generated and stored with its model, version, prompt-template version and time. Keep the raw data it summarises visible beside it.
 - Attribution in a shared home: report a dose or reading for a person only when the platform has a person-level link. A sole resident is the only automatic link. A schedule-based or position-based assignment is "prescribed to", never "taken by". A shared device (for example one pulse oximeter used by two residents) stays unassigned until the person is recorded.
+- Access to a patient is a scoped, audited grant. A clinician sees only the homes assigned to them, a family member sees only the household they are linked to, and every grant, change and revocation writes an audit row.
+- A needs-review flag lists the recorded reasons it was derived from. Never show a reason the data does not contain, and show no flag without a reason.
 - A clinician's review decision records the reviewer, time and decision, and changes review status only. It never changes the stored severity, and it never turns a placeholder threshold into a validated one.
+- A review queue and its decision endpoint must use the same lookup. Every item the queue lists must be decidable, including items whose linked alert is already resolved. Test the decision for each item state the queue can show.
 - Show time and source for every clinical value. Stale data must look stale.
 - Missing data is not normal data. Show "not recorded" rather than zero.
 - Alarms need an acknowledgement, an owner, and escalation when unacknowledged.
