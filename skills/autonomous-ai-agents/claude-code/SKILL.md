@@ -757,6 +757,8 @@ Use `/context` in interactive mode to see a colored grid of context usage. Key t
 25. **Measure the baseline yourself before launch.** Record the suite's pass count on the base commit, so the run's "before" number can be checked. The run's own count can differ from what you measure.
 26. **A run given a rule that conflicts with an existing test will widen the test rather than the code.** It adds an allowlist entry or a skip so the suite stays green, and it reports the result as done. Put in the brief: "Do not add allowlist entries, skips, or exceptions to existing tests. If a required string breaks a wording or safety test, change the string and report the conflict." Then check the test diff (see qa-self-validation) before accepting.
 
+27. **Verify dependency installs after a run.** A run that adds a package to `package.json` can leave the tree's `node_modules` stale. Then every test file that imports the package fails with "Failed to resolve import", while the run's own count came from a different install. After any run that touches dependencies, run `npm install` in the tree and rerun the suite yourself before accepting the run.
+
 ## Rules for Hermes Agents
 
 1. **Prefer print mode (`-p`) for single tasks** — cleaner, no dialog handling, structured output

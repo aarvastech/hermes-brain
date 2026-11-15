@@ -10,4 +10,4 @@ gh pr edit fails on this host with a Projects (classic) deprecation error. Updat
 §
 AARVAS Care repos: ~/work/provider-platform (hermes/provider-platform, API and web) and ~/work/aarvas-mobile (hermes/aarvas-mobile, app). Public API: ~/network-site/run-api.sh behind Caddy.
 §
-Expo tunnel dies when its shell session ends; restart it and confirm the tunnel URL returns 200 before reporting. Web build needs VITE_KEYCLOAK_URL=https://auth.network.aarvastech.com, VITE_KEYCLOAK_REALM=aarvas-care, VITE_KEYCLOAK_CLIENT_ID=aarvas-care-web; without them it falls back to localhost:8080 realm aarvas. Summit backups: cron 21:00 UTC, status 22:00 UTC, dumps in ~/summit-backups (7-day retention, ALERT on failure).
+Expo tunnel URL changes on each restart; confirm it returns 200 before reporting. Web build needs VITE_KEYCLOAK_URL=https://auth.network.aarvastech.com, VITE_KEYCLOAK_REALM=aarvas-care, VITE_KEYCLOAK_CLIENT_ID=aarvas-care-web; without them it falls back to localhost:8080 realm aarvas. Summit backups: cron 21:00 UTC, status 22:00 UTC, dumps in ~/summit-backups (7-day retention, ALERT on failure).
