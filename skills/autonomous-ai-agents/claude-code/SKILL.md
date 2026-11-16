@@ -759,6 +759,8 @@ Use `/context` in interactive mode to see a colored grid of context usage. Key t
 
 27. **Verify dependency installs after a run.** A run that adds a package to `package.json` can leave the tree's `node_modules` stale. Then every test file that imports the package fails with "Failed to resolve import", while the run's own count came from a different install. After any run that touches dependencies, run `npm install` in the tree and rerun the suite yourself before accepting the run.
 
+28. **Gate commits on the runner's own exit code, not a pipeline's.** `cmd | tail -1 && git commit` takes the exit code of `tail`, so a failing test run still commits. Capture the runner's status first (`npx jest --ci > log 2>&1; J=$?`), then branch on `$J`. The same applies to `vitest` and `pytest`. Tell delegated runs the same thing: commit only after the suite exits 0 in their own shell.
+
 ## Rules for Hermes Agents
 
 1. **Prefer print mode (`-p`) for single tasks** — cleaner, no dialog handling, structured output

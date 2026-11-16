@@ -67,7 +67,7 @@ Run these stages in order, in one run, without pausing between them. When the ow
 - Negative margins inside scroll views can be ignored on device. Check on device.
 - The Expo gear button is a dev-build artefact. Confirm it is absent in a release build.
 - Do not call a screen finished because the bundle built.
-- Expo tunnel URLs change and an old one returns 502 Bad Gateway. Recovery steps: references/expo-tunnel-preview.md. A dev server started in a foreground shell dies when that shell ends; start it under nohup and confirm the bundle returns 200 before sending the address.
+- Expo tunnel URLs change and an old one returns 502 Bad Gateway. Recovery steps, including the 409 session conflict that makes a restart crash: references/expo-tunnel-preview.md. A dev server started in a foreground shell dies when that shell ends; start it under nohup and confirm the bundle returns 200 before sending the address.
 - A grid tile is a `Pressable` with `accessibilityRole="button"`. Keep the escalation or secondary action as a text link, not a button in the grid.
 - Commit gating: see qa-self-validation (commit only when the test exit code is 0).
 - Before telling the owner to reload, check that the tunnel bundle returns 200 at that moment and quote the exact address in the same message. A tunnel that was up earlier can be down by the time the owner opens it.

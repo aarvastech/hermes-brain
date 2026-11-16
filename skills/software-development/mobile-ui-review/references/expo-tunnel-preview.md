@@ -15,6 +15,8 @@ Use when the owner reports a 502 Bad Gateway or "No server is connected" in Expo
 
 ## Pitfalls
 
+- A tunnel `409` in the Expo log (`Unexpected server response: 409`) means the tunnel service still holds the old session. The new tunnel then crashes at start, and the 502 follows. Recovery: stop every `expo start` and `ngrok` process (`pkill -f "expo start"`, `pkill -f ngrok`), wait about 8 seconds so the old session expires, then start one session. Confirm the bundle returns 200 before sending the link.
+- Typical restart takes 1.5 to 2 minutes before the host prints. Poll the log in short loops with a break on the host line; a fixed long sleep makes the restart look stalled.
 - A 502 means the dev server or its tunnel stopped. The cause of an earlier stop was not confirmed, so read the dev server log for the exit before naming a cause. Restart with the steps above, and tell the owner the link can stop again.
 - Stop the old server with an exact PID or the exact command line. A broad `pkill -f` pattern can match your own shell and kill the gateway (exit -15).
 - The host's port can be held by an earlier process. If a restart fails with `address already in use`, find that PID before starting another server.
