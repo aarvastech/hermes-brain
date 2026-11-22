@@ -33,6 +33,14 @@ Use when the public demo gate must give way to real identity. Each step has a ch
 - Web: build with the Keycloak URL, realm and client ID set. Build from a clean env so the local dev settings don't leak in.
 - Check: sign in in a real browser for at least two roles, and confirm each sees only its own scope. A 401 at the API after sign-in usually means the issuer setting in step 2 is wrong.
 
+## 7. Sign-in page branding (login theme)
+- Put the theme under `/opt/keycloak/themes/<name>/login/` with `theme.properties` and `login.ftl` inside `login/`. Files placed at the theme root are ignored or give a 500 on the auth endpoint. Create the folders as root (`docker exec -u 0`), then `chmod -R a+rX`.
+- Do not import a template fragment unless the Keycloak version ships it. An import of a missing `common/keycloak.ftl` returns 500 on `/protocol/openid-connect/auth`. Check the container log for `TemplateNotFoundException` after each change.
+- Set `loginTheme` in the realm only after the files are in place and the login page renders. Order: copy files, restart, set the theme, then check the auth URL returns 200 and contains the expected heading. If the check fails, set `loginTheme=keycloak` at once to restore sign-in. Sign-in must never sit on a broken theme.
+- Keycloak serves theme CSS from a cache keyed on the file. Editing an already-served stylesheet can leave the browser on the old rules, even after a restart. Put new rules in a new file name, list it in `theme.properties` (`styles=css/a.css css/b.css`), and restart.
+- Verify styles in the browser (the computed style or bounding box of the card, and the stylesheet's CSSOM), not with curl alone. Curl returns the file, but it does not show whether the browser applied the rules.
+- After any container restart, log in to kcadm again before the next command.
+
 ## Pitfalls
 - Do not switch the live public site before the staff passwords exist. The role picker goes away and every visitor is locked out.
 - Audience checks are a gap until the API verifies the audience claim. Note it in the report instead of calling sign-in complete.
