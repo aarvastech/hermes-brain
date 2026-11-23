@@ -162,3 +162,4 @@ Save the report to `{output_dir}/report.md`.
 - **Check responsive behavior** by noting any layout issues visible in screenshots.
 - **Don't forget edge cases**: empty states, very long text, special characters, rapid clicking.
 - When reporting screenshots to the user, include `MEDIA:<screenshot_path>` so they can see the evidence inline.
+- For signed-in, role-by-role checks and Playwright setup, read `references/playwright-role-checks.md` first. It has the read-only rules, the secret-handling rules, and the grep list for each role's screens.

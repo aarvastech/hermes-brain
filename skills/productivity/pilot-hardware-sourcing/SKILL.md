@@ -35,3 +35,7 @@ Use this when a pilot needs devices (hubs, sensors, cameras, wearables). The age
 - Standalone safety wearables often bundle microphone recording, GPS tracking, or police or third-party dispatch. Treat each as a blocking question for the owner, not a default. Say whether it can be disabled.
 - A device that cannot export events to our platform is a separate family app, not a source for the care record. Mark it so in the table.
 - When the owner pauses a sourcing thread, stop: no searches, no vendor contact, no quote drafts. Keep the candidate table as it stands, list what is parked and why, and resume only when the owner asks.
+- A shared product link (a short Amazon link, for example) must be extracted and its title read before it is endorsed. A link can point to a different category, such as a desktop PC instead of a hub, so confirm the product type first.
+- Radio bands and mains power are region-specific. Zigbee at 2.4 GHz works worldwide. Z-Wave and similar sub-GHz radios differ by region, so a device bought for one country may not work in another. US mains is 120 V; a home in India needs 230 V and the local radio certificate.
+- Prescription-only devices (for example CGM) are the prescriber's choice. List the category and the prescribing route; do not pick a brand for the patient.
+- Before recommending a smart pill dispenser or sensor, confirm the vendor's data export or API. The platform can only read what the vendor exposes.

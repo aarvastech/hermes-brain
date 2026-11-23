@@ -23,7 +23,7 @@ Use this for patient records, clinical workflows, emergency response, lab orders
 
 - A notification is not an action. Never imply an ambulance, doctor or pharmacy has been dispatched or has accepted unless a real system confirmed it.
 - Clinical thresholds (SpO2, heart rate, blood pressure, fall timing) are configuration. They need a named clinician's sign-off before real use. Until then, label every threshold "not yet clinically validated" in the stored record and in every output. Do not use the word demo in app or UI text.
-- Physiological thresholds need a registered physician (MBBS), ideally with geriatrics, emergency or critical-care experience. A dentist or other non-physician qualification does not qualify. Record the approver in the decision log with the sign-off date. For the role's duties, qualifications, independence rules and the approval record fields, see references/clinical-approver-role.md.
+- Physiological thresholds need a registered physician (MBBS), ideally with geriatrics, emergency or critical-care experience. A dentist or other non-physician qualification does not qualify. The licence must match the country where the patients live: an Indian NMC registration does not cover a home in the USA, so a US home needs a reviewer licensed in that state. Record the approver in the decision log with the sign-off date. For the role's duties, qualifications, independence rules and the approval record fields, see references/clinical-approver-role.md.
 - AI may draft notes, summarise history, rephrase approved wording and suggest checks. It must not diagnose, prescribe, change a dose or schedule, or set or change an emergency severity. A clinician approves every draft before it enters the record.
 - AI rephrasing of an approved template must be validated mechanically: every number, time, dose and medication name from the template must appear unchanged in the output, and no sentence may add a medical instruction. On failure, return the original template and record the fallback.
 - Every AI output is labelled AI-generated and stored with its model, version, prompt-template version and time. Keep the raw data it summarises visible beside it.
@@ -35,6 +35,8 @@ Use this for patient records, clinical workflows, emergency response, lab orders
 - Show time and source for every clinical value. Stale data must look stale.
 - Missing data is not normal data. Show "not recorded" rather than zero.
 - Alarms need an acknowledgement, an owner, and escalation when unacknowledged.
+- An escalation path always needs a named responder, a timeout, and a visible label saying what the service is not (for example, "not an emergency service"). If the household has no responder, the alert has no escalation path and must not be presented as one.
+- Show every recorded reading, but keep out-of-range alerts and escalations switched off for a real person until the threshold sign-off is recorded. A reading's display and its alert are two separate switches.
 - Units matter. Store the unit with the value. Reject values out of plausible range.
 - Duplicate detection matters for patients, orders and results.
 

@@ -41,6 +41,7 @@ Use this for a single-host deploy: a Vite/React static build, an API on localhos
 - A build output directory tracked in git changes on every build. Treat it as a scratch copy: build into a fresh folder (`npx vite build --outDir <scratch> --emptyOutDir`), verify it, and deploy from there. Do not commit the tracked output, or the next deploy diff hides real changes.
 - Local dev env files (`.env.local`) are read by the build. Pass the public `VITE_*` values on the build command line so a localhost value in a local file cannot leak into the public bundle, then grep the bundle for `localhost`.
 - A live API that runs from a working tree serves the branch checked out at its last restart, and it also serves any uncommitted edits in that folder. Before a deploy, commit or deliberately stash the local edits, and confirm which ones will be live. Checking out a branch in that folder changes production on the next restart, so do it only with the rollback commit recorded.
+- If a failed deploy leaves the live folder missing or empty, restore the newest `dist.bak-*` copy, restart the Caddy container, and re-check `/app` with curl. Do this before any new build attempt, because each attempt that fails again extends the outage.
 
 ## Decision
 
